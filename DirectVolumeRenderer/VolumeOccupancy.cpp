@@ -18,7 +18,7 @@ void VolumeOccupancy::Initialize(GraphicsDevice* device, ContentManager* content
 	}
 }
 
-std::shared_ptr<Texture> VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Texture> source)
+void VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Texture> source, std::shared_ptr<Texture> transfer)
 {
 	Uint32 width = source->GetWidth();
 	Uint32 height = source->GetHeight();
@@ -32,8 +32,9 @@ std::shared_ptr<Texture> VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Tex
 	m_GraphicsDevice->UpdateBuffer(m_ConstantBuffer, (Byte*)&m_GridData, sizeof(GridData));
 	m_GraphicsDevice->BindConstantBuffer(m_ConstantBuffer, 0);
 
-	// Bind source
+	// Bind source & Transfer
 	source->Bind(0);
+	transfer->Bind(1);
 
 	// Bind a UAV texture for Compute Result
 	Texture computeResult;
@@ -50,11 +51,31 @@ std::shared_ptr<Texture> VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Tex
 	m_GraphicsDevice->Dispatch((Uint32)dispatch.x, (Uint32)dispatch.y, (Uint32)dispatch.z);
 	//m_GraphicsDevice->Dispatch(width, height, depth);
 
-	std::shared_ptr<Texture> volume = std::make_shared<Texture>();
-	volume->Create3D(width / 8, height / 8, depth / 8, BufferUsage::Immutable, SurfaceFormat::R8_Unorm);
-	computeResult.GetGPUData(volume->GetData(), volume->GetByteCount());
-	volume->Apply();
+	// Create a new occupancy map for storage.
+	if (m_OccupancyMap == nullptr)
+	{
+		m_OccupancyMap = std::make_shared<Texture>();
+		m_OccupancyMap->Create3D(width / 8, height / 8, depth / 8, BufferUsage::Immutable, SurfaceFormat::R8_Unorm);
+		m_OccupancyMap->SetFilter(FilterMode::MinMagMipPoint);
+		m_OccupancyMap->SetWrapMode(WrapMode::Clamp);
+	}
 
-	//computeResult.Release();
-	return volume;
+	computeResult.GetGPUData(m_OccupancyMap->GetData(), m_OccupancyMap->GetByteCount());
+	m_OccupancyMap->Apply(true);
+	computeResult.Release();
+}
+
+std::shared_ptr<Texture> VolumeOccupancy::GetOccupancyTexture() const
+{
+	return m_OccupancyMap;
+}
+
+void VolumeOccupancy::Release()
+{
+	if (m_OccupancyMap && m_OccupancyMap->IsDisposed() == false)
+	{
+		m_OccupancyMap->Release();
+		m_OccupancyMap.reset();
+	}
+
 }

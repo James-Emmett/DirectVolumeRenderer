@@ -297,9 +297,10 @@ float4 frag(v2f i) : SV_TARGET
 				// Sample origional volume with p
 				float4 voxel = _VolumeMap.SampleLevel(_VolumeSampler, start, 0).rgba;
 				
-				if(voxel.w >= _Hounsfield)
+				float4 microfacet = _AlbedoTransfer.SampleLevel(_AlbedoSampler, float2(voxel.w, 0.5), 0);
+				
+				if(microfacet.w >= _Hounsfield)
 				{
-					float4 microfacet = _AlbedoTransfer.SampleLevel(_AlbedoSampler, float2(voxel.w, 0.5), 0);
 					float4 albedo 	  = _AlbedoTransfer.SampleLevel(_AlbedoSampler, float2(voxel.w, 0), 0);
 					float metalness   = microfacet.r;
 					float roughness   = microfacet.g;

@@ -86,7 +86,7 @@ public:
 	void			ClearCPUData();
 
 	// Submits data to low-level GPU interface if required.
-	void Apply();
+	void Apply(bool keepResident = false);
 	void Bind(int slot, ShaderType stage = ShaderType::PS);
 	void LoadFromFile(const std::string& fileName);
 	bool SaveToFile(std::string filePath);

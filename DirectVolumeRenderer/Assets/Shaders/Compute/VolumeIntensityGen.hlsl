@@ -1,6 +1,9 @@
 Texture3D<float4> _InputBuffer : register(t0);
 RWTexture3D<float> _Result : register(u0);
 
+Texture2D _AlbedoTransfer : register(t1);
+SamplerState _AlbedoSampler 	  : register(s1);
+
 cbuffer VolumeData : register(b0)
 {
 	float3 _VolumeDimensions;
@@ -36,7 +39,9 @@ void CSMain(uint3 id : SV_DispatchThreadID )
 		{
 			for (int x = minVolumePos.x; x < Width; x++)
 			{	
-				fmax = max(fmax, ReadPixel(x, y, z));
+				// Find max alpha of the chunk
+				float4 microfacet = _AlbedoTransfer.SampleLevel(_AlbedoSampler, float2(ReadPixel(x, y, z), 0.25), 0);
+				fmax = max(fmax, microfacet.w);
 			}
 		}
 	}

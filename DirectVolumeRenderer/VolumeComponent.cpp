@@ -60,11 +60,7 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 		m_VolumeMap.reset();
 	}
 
-	if (m_OccupancyMap && m_OccupancyMap->IsDisposed() == false)
-	{
-		m_OccupancyMap->Release();
-		m_OccupancyMap.reset();
-	}
+	m_OccupancyGenerator.Release();
 
 	//--Get Extension--
 	std::string ext = volumePath.c_str();
@@ -87,11 +83,6 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 		// Generate volume with normals
 		m_VolumeMap = m_VolumeGenerator.GenerateVolume(source);
 		source->Release();
-
-		// Generate intensity grid for Empty Space-Skipping
-		m_OccupancyMap = m_OccupancyGenerator.GenerateVolumeGrid(m_VolumeMap);
-		m_OccupancyMap->SetFilter(FilterMode::MinMagMipPoint);
-		m_OccupancyMap->SetWrapMode(WrapMode::Clamp);
 	}
 	else
 	{
@@ -103,6 +94,9 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 
 	//--Initialize the transferFunction--
 	m_TransferFunction.Initialize(volumeTransferPath);
+
+	//--Generate intensity grid for Empty Space-Skipping--
+	m_OccupancyGenerator.GenerateVolumeGrid(m_VolumeMap, m_TransferFunction.GetDiffuseTransfer());
 
 	m_VolumeData.Width = (float)m_VolumeMap->GetWidth();
 	m_VolumeData.Height = (float)m_VolumeMap->GetHeight();
@@ -120,7 +114,7 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 
 	// Mip Vol Textures
 	m_VolumeMaterials[(Uint32)VolumeMethod::MIP]->SetTexture(0, m_VolumeMap);
-	m_VolumeMaterials[(Uint32)VolumeMethod::MIP]->SetTexture(1, m_OccupancyMap);
+	m_VolumeMaterials[(Uint32)VolumeMethod::MIP]->SetTexture(1, m_OccupancyGenerator.GetOccupancyTexture());
 	m_VolumeMaterials[(Uint32)VolumeMethod::MIP]->SetVector3("VolumeDims", dims);
 	m_VolumeMaterials[(Uint32)VolumeMethod::MIP]->SetVector3("OccupancyDims", occupancyDims);
 	m_VolumeMaterials[(Uint32)VolumeMethod::MIP]->SetVector3("StepSize", stepSize);
@@ -128,7 +122,7 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 
 	// Alpha Vol Textures
 	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha]->SetTexture(0, m_VolumeMap);
-	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha]->SetTexture(1, m_OccupancyMap);
+	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha]->SetTexture(1, m_OccupancyGenerator.GetOccupancyTexture());
 	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha]->SetVector3("VolumeDims", dims);
 	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha]->SetVector3("OccupancyDims", occupancyDims);
 	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha]->SetVector3("StepSize", stepSize);
@@ -136,7 +130,7 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 
 	// PBR Vol Textures
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(0, m_VolumeMap);
-	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(1, m_OccupancyMap);
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(1, m_OccupancyGenerator.GetOccupancyTexture());
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(2, m_TransferFunction.GetDiffuseTransfer());
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetVector3("VolumeDims", dims);
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetVector3("OccupancyDims", occupancyDims);
@@ -255,7 +249,10 @@ void VolumeComponent::OnGui()
 
 			if (m_VolumeMethod == VolumeMethod::PBR)
 			{
-				m_TransferFunction.OnGui();
+				if (m_TransferFunction.DisplayEditor())
+				{
+					m_OccupancyGenerator.GenerateVolumeGrid(m_VolumeMap, m_TransferFunction.GetDiffuseTransfer());
+				}
 			}
 		}
 	}

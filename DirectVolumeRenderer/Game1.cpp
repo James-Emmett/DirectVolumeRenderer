@@ -22,11 +22,11 @@ void Game1::Initialize()
 	m_Camera->m_Transform->SetPosition(Vector3(0, 0, -3));
 	m_Camera->m_Background = Color(0.3f, 0.3f, 0.3f, 1.0f);
 
-	Entity* cabinet = m_Scene.CreateEntity(Application::NextEntityID());
-	cabinet->m_Transform->SetPosition(Vector3(2, 0, 0));
-	m_GothicCabinet = cabinet->AddComponent<MeshRenderer>();
-	m_GothicCabinet->m_Mesh = m_ContentManager->Load<Mesh>("Assets/Models/GothicCabinet_01/GothicCabinet_01.mesh");
-	m_GothicCabinet->m_Material = m_ContentManager->Load<Material>("Assets/Models/GothicCabinet_01/GothicCabinet.material");
+	//Entity* cabinet = m_Scene.CreateEntity(Application::NextEntityID());
+	//cabinet->m_Transform->SetPosition(Vector3(2, 0, 0));
+	//m_GothicCabinet = cabinet->AddComponent<MeshRenderer>();
+	//m_GothicCabinet->m_Mesh = m_ContentManager->Load<Mesh>("Assets/Models/GothicCabinet_01/GothicCabinet_01.mesh");
+	//m_GothicCabinet->m_Material = m_ContentManager->Load<Material>("Assets/Models/GothicCabinet_01/GothicCabinet.material");
 
 	Entity* grid = m_Scene.CreateEntity(Application::NextEntityID());
 	m_Grid = grid->AddComponent<GridRenderer>();

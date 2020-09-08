@@ -22,7 +22,6 @@ class VolumeComponent : public Component<VolumeComponent>
 {
 public:
 	std::shared_ptr<Texture> m_VolumeMap;
-	std::shared_ptr<Texture> m_OccupancyMap;
 	std::shared_ptr<Texture> m_Noise;
 	TransferFunction m_TransferFunction;
 
@@ -50,7 +49,6 @@ public:
 	void LoadVolume(std::string volumePath);
 	void OnGui();
 	void Shutdown();
-	void Something();
 
 private:
 	void UpdateMaterial();

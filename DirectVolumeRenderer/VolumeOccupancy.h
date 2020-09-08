@@ -29,8 +29,11 @@ private:
 	std::shared_ptr<Shader>	m_ComputeShader;
 	std::string				m_ComputePath;
 	BufferHandle			m_ConstantBuffer;
+	std::shared_ptr<Texture> m_OccupancyMap;
 
 public:
 	void Initialize(GraphicsDevice* device, ContentManager* contentManager, std::string computePath);
-	std::shared_ptr<Texture> GenerateVolumeGrid(std::shared_ptr<Texture> src);
+	void GenerateVolumeGrid(std::shared_ptr<Texture> src, std::shared_ptr<Texture> transfer);
+	std::shared_ptr<Texture> GetOccupancyTexture()const;
+	void Release();
 };

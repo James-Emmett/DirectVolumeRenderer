@@ -99,6 +99,7 @@ private:
 	int m_SelectedNode = -1;
 	bool m_CanvasClicked = false;
 	bool m_Dirty = false;
+	bool m_MouseDownPrevious = false;
 
 public:
 	void Initialize(std::string path)
@@ -213,11 +214,12 @@ public:
 		}
 
 		// Update the new data to the GPU
-		m_TransferTex->Apply();
+		m_TransferTex->Apply(true);
 		m_Dirty = false;
 	}
 
-	void OnGui()
+	// Returns true if edited in any way and its finsihed editign too
+	bool DisplayEditor()
 	{
 		// Reference for how i figured out imgui point drawing:
 		// https://github.com/Twinklebear/imgui-transfer-function/blob/master/transfer_function_widget.cpp
@@ -310,7 +312,7 @@ public:
 							m_Dirty = true; // Should this be here?
 						}
 					}
-					else
+					else if (m_MouseDownPrevious == false) // Only add if its a new click
 					{
 						// I dont like the repeated check but i have to do it
 						m_SelectedNode = GetNodeOverlap(clippedMousePos, viewScale, viewOffset);
@@ -400,13 +402,21 @@ public:
 				}
 			}
 
+			// cache mouse
+			m_MouseDownPrevious = io.MouseDown[0];
+
 			if (m_Dirty)
 			{
 				// sort points based on the x coordinated
 				std::sort(m_Nodes.begin(), m_Nodes.end(), &TransferNode::Sorter);
 				GenerateTransferFunction();
 				m_Dirty = false;
+
+				// only return edited if its dirty and we finished?
+				return m_MouseDownPrevious == false;
 			}
+
+			return false;
 		}
 	}
 

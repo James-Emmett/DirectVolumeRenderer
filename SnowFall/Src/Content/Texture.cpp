@@ -417,7 +417,7 @@ void Texture::ClearCPUData()
 	}
 }
 
-void Texture::Apply()
+void Texture::Apply(bool keepResident)
 {
 	if (m_GraphicsDevice == nullptr) { return; }
 	if (m_TextureDesc.ByteCount == 0) { LogWarning("No Bytes to set."); return; }
@@ -435,6 +435,12 @@ void Texture::Apply()
 	if (m_SamplerHandle.IsValid() == false)
 	{
 		m_SamplerHandle = m_GraphicsDevice->CreateSamplerState(&m_SamplerDesc);
+	}
+
+	if (keepResident == false)
+	{
+		delete[] m_Data;
+		m_Data = nullptr;
 	}
 }
 
