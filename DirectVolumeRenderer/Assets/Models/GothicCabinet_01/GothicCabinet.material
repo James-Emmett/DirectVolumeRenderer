@@ -1,0 +1,10 @@
+<Material>
+	<Properties>
+		<Property type="Texture" name="Diffuse" source="Assets/Models/GothicCabinet_01/GothicCabinet_01_Diffuse.png"/>
+		<Property type="Texture" name="Normal" source="Assets/Models/GothicCabinet_01/GothicCabinet_01_Normal.png"/>
+		<Property type="Texture" name="Metalness" source="Assets/Models/GothicCabinet_01/GothicCabinet_01_Metalness.png"/>
+		<Property type="Texture" name="Roughness" source="Assets/Models/GothicCabinet_01/GothicCabinet_01_Roughness.png"/>
+	</Properties>
+	
+	<Shader name="Diffuse" source="Assets/Shaders/PBR.shader"/>
+</Material>

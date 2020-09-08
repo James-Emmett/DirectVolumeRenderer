@@ -1,0 +1,7 @@
+<Material>
+	<Properties>
+		<Property name="Color" type="Vector3" X="1" Y="1" Z="1"/>
+	</Properties>
+	
+	<Shader name="Diffuse" source="Assets/Shaders/Grid/grid.shader"/>
+</Material>
