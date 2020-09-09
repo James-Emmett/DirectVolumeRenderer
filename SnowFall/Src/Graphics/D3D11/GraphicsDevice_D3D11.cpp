@@ -356,7 +356,7 @@ bool GraphicsDevice::Initialize(const GraphicsParameters& info, const GPUMemory&
     assert(SUCCEEDED(hr));
 
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-    rtvDesc.Format = (DXGI_FORMAT)FormatToDXGIFormat((SurfaceFormat)m_Parameters.BackBufferFormat);//(DXGI_FORMAT)FormatUtil::FormatToDXGIFormat(FormatUtil::LinearToSRGBFormat((SurfaceFormat)m_Parameters.BackBufferFormat));
+    rtvDesc.Format = (DXGI_FORMAT)FormatToDXGIFormat(LinearToSRGBFormat((SurfaceFormat)m_Parameters.BackBufferFormat));
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
     if (FAILED(m_Device->CreateRenderTargetView(m_BackBuffer, &rtvDesc, &m_RenderTarget)))

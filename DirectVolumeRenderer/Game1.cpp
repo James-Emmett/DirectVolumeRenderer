@@ -19,6 +19,7 @@ void Game1::Initialize()
 	// Create Camera
 	Entity* camera = m_Scene.CreateEntity(Application::NextEntityID());
 	m_Camera = camera->AddComponent<FlyCamera>();
+	m_Camera->SetCamera(m_GameSettings.GetWidth(), m_GameSettings.GetHeight(), 75, 0.01, 1000, Projection::Perspective);
 	m_Camera->m_Transform->SetPosition(Vector3(0, 0, -3));
 	m_Camera->m_Background = Color(0.3f, 0.3f, 0.3f, 1.0f);
 

@@ -42,8 +42,8 @@ bool ConfigFile::Open(std::string fileName)
 					int seperator_Pos = (int)line.find_first_of('=', (size_t)0);
 					if (seperator_Pos > 0)
 					{
-						key = line.substr(0, line.find_first_of(" "));
-						value = line.substr(line.find_first_not_of(" ", (size_t)seperator_Pos + 1));
+						key = line.substr(0, seperator_Pos);
+						value = line.substr(seperator_Pos + 1);
 						currentSettings->insert(std::make_pair(key, value));
 					}
 				}
