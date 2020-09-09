@@ -18,6 +18,7 @@ public:
 	// Which log level this responds up too, -1 is all
 	int logLevel = -1;
 	virtual void OutputLog(const std::string& message) = 0;
+	virtual void Flush() {};
 };
 
 // Handles low-level long handling
@@ -33,6 +34,8 @@ public:
 	static void Unsubscribe(LogObserver* observer);
 	static void WriteMessage(LogType type, char const* file, int line, const std::string& message);
 	static void WriteMessage(LogType type, const std::string& message);
+	// Force everything to output now i.e file log etc.
+	static void FlushObervers();
 };
 
 #if defined(DEBUG)

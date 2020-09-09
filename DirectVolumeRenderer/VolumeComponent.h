@@ -7,7 +7,7 @@
 #include "VolumeOccupancy.h"
 #include "TransferFunction.h"
 
-enum class VolumeMethod { MIP, Alpha, PBR };
+enum class VolumeMethod { MIP, Alpha, PBR, PBR_ESS};
 
 struct VolumeData
 {
@@ -29,7 +29,7 @@ public:
 	ContentManager* m_ContentManager = nullptr;
 	GraphicsDevice* m_GraphicsDevice = nullptr;
 	std::shared_ptr<MeshRenderer> m_MeshRenderer;
-	std::shared_ptr<Material>	  m_VolumeMaterials[3];
+	std::shared_ptr<Material>	  m_VolumeMaterials[4];
 	VolumeMethod				  m_VolumeMethod = VolumeMethod::PBR;
 	VolumeData					  m_VolumeData;
 	VolumeGenerator				  m_VolumeGenerator;

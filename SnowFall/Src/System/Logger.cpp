@@ -80,6 +80,16 @@ void LogHandler::WriteMessage(LogType type, const std::string& message)
 	Instance().NotifyObservers(type, outMessage.c_str());
 }
 
+void LogHandler::FlushObervers()
+{
+	std::set<LogObserver*>& observerSet = Instance().m_Observers;
+
+	for (LogObserver* observer : observerSet)
+	{
+		observer->Flush();
+	}
+}
+
 LogFile::LogFile(const char* destination)
 {
 	m_FilePath = destination;

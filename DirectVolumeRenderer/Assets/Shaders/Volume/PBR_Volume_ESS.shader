@@ -2,6 +2,7 @@
 
 	<Properties>
 		<Property name="VolumeMap" type="Texture"/>
+		<Property name="OccupancyMap" type="Texture"/>
 		<Property name="AlbedoTransfer" type="Texture"/>
 		<Property name="SurfaceTransfer" type="Texture"/>
 		<Property name="Noise" type="Texture"/>
@@ -9,6 +10,7 @@
 		<Property name="StepSize" type="Vector3"/>
 		<Property name="Iterations" type="Float" min="0" max="1.0"/>
 		<Property name="VolumeDims" type="Vector3"/>
+		<Property name="OccupancyDims" type="Vector3"/>
 	</Properties>
 	
 	<RenderState>
@@ -28,7 +30,7 @@
 	<RenderQueue type="Transparent"/>
 	
 	<Shaders>
-		<ShaderPath type="VS" source="Assets/Shaders/Volume/PBR_Volume.hlsl" entry="vert"/>
-		<ShaderPath type="FS" source="Assets/Shaders/Volume/PBR_Volume.hlsl" entry="frag"/>
+		<ShaderPath type="VS" source="Assets/Shaders/Volume/PBR_Volume_ESS.hlsl" entry="vert"/>
+		<ShaderPath type="FS" source="Assets/Shaders/Volume/PBR_Volume_ESS.hlsl" entry="frag"/>
 	</Shaders>
 </Shader>

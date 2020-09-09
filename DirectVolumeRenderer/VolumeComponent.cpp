@@ -7,16 +7,17 @@
 #include "World/Entity.h"
 #include "System/FileDialog.h"
 
-const char* items[] = { "MIP", "ALPHA", "PBR" };
+const char* items[] = { "MIP", "ALPHA", "PBR", "PBR_ESS"};
 const char* itemsMetaFormat[] = {"Uint8", "Uint16"};
 
 void VolumeComponent::Initialize(GraphicsDevice* graphicsDevice, ContentManager* contentManager)
 {
 	m_ContentManager = Application::contentManager;
 	m_GraphicsDevice = Application::graphicsDevice;
-	m_VolumeMaterials[(Uint32)VolumeMethod::MIP] = std::make_shared<Material>(m_ContentManager->Load<Shader>("Assets/Shaders/Volume/Mip_Volume.shader"));
-	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha] = std::make_shared<Material>(m_ContentManager->Load<Shader>("Assets/Shaders/Volume/Alpha_Volume.shader"));
-	m_VolumeMaterials[(Uint32)VolumeMethod::PBR] = std::make_shared<Material>(m_ContentManager->Load<Shader>("Assets/Shaders/Volume/PBR_Volume.shader"));
+	m_VolumeMaterials[(Uint32)VolumeMethod::MIP]	 = std::make_shared<Material>(m_ContentManager->Load<Shader>("Assets/Shaders/Volume/Mip_Volume.shader"));
+	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha]	 = std::make_shared<Material>(m_ContentManager->Load<Shader>("Assets/Shaders/Volume/Alpha_Volume.shader"));
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]	 = std::make_shared<Material>(m_ContentManager->Load<Shader>("Assets/Shaders/Volume/PBR_Volume.shader"));
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS] = std::make_shared<Material>(m_ContentManager->Load<Shader>("Assets/Shaders/Volume/PBR_Volume_ESS.shader"));
 
 	// Load the cube
 	m_MeshRenderer = m_Entity->AddComponent<MeshRenderer>();
@@ -31,6 +32,7 @@ void VolumeComponent::Initialize(GraphicsDevice* graphicsDevice, ContentManager*
 	m_VolumeMaterials[(Uint32)VolumeMethod::MIP]->SetTexture(2, m_Noise);
 	m_VolumeMaterials[(Uint32)VolumeMethod::Alpha]->SetTexture(2, m_Noise);
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(3, m_Noise);
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetTexture(4, m_Noise);
 
 	// Init our compute shader generators.
 	m_VolumeGenerator.Initialize(m_GraphicsDevice, m_ContentManager, "Assets/Shaders/Compute/VolumeNormalGen.shader");
@@ -130,12 +132,22 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 
 	// PBR Vol Textures
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(0, m_VolumeMap);
-	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(1, m_OccupancyGenerator.GetOccupancyTexture());
-	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(2, m_TransferFunction.GetDiffuseTransfer());
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(1, m_TransferFunction.GetDiffuseTransfer());
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetTexture(2, m_TransferFunction.GetSurfaceTransfer());
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetVector3("VolumeDims", dims);
-	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetVector3("OccupancyDims", occupancyDims);
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetVector3("StepSize", stepSize);
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR]->SetFloat("Iterations", maxSize);
+
+
+	// PBR ESS
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetTexture(0, m_VolumeMap);
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetTexture(1, m_OccupancyGenerator.GetOccupancyTexture());
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetTexture(2, m_TransferFunction.GetDiffuseTransfer());
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetTexture(3, m_TransferFunction.GetSurfaceTransfer());
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetVector3("VolumeDims", dims);
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetVector3("OccupancyDims", occupancyDims);
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetVector3("StepSize", stepSize);
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetFloat("Iterations", maxSize);
 
 	UpdateMaterial();
 }
@@ -247,11 +259,14 @@ void VolumeComponent::OnGui()
 				}
 			}
 
-			if (m_VolumeMethod == VolumeMethod::PBR)
+			if (m_VolumeMethod == VolumeMethod::PBR || m_VolumeMethod == VolumeMethod::PBR_ESS)
 			{
 				if (m_TransferFunction.DisplayEditor())
 				{
-					m_OccupancyGenerator.GenerateVolumeGrid(m_VolumeMap, m_TransferFunction.GetDiffuseTransfer());
+					if (m_VolumeMethod == VolumeMethod::PBR_ESS)
+					{
+						m_OccupancyGenerator.GenerateVolumeGrid(m_VolumeMap, m_TransferFunction.GetDiffuseTransfer());
+					}
 				}
 			}
 		}

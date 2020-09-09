@@ -92,7 +92,8 @@ class TransferFunction
 {
 private:
 	// Reduce to a single Texture2D with point sampling?
-	std::shared_ptr<Texture>  m_TransferTex;
+	std::shared_ptr<Texture>  m_Diffuse;
+	std::shared_ptr<Texture>  m_Surface;
 	std::vector<TransferNode> m_Nodes;
 	std::string m_FilePath;
 	int m_DraggingNode = -1;
@@ -134,11 +135,19 @@ public:
 			m_Nodes.push_back(TransferNode(128, 0.75f, 1, 0, 1, 0.5f, 0));
 			m_Nodes.push_back(TransferNode(255, 1.0f, 0, 0, 1, 0.5f, 0));
 		}
-		if (m_TransferTex == nullptr)
+
+		if (m_Diffuse == nullptr)
 		{
-			m_TransferTex = std::make_shared<Texture>();
-			m_TransferTex->Create2D(255, 2, 1, false, BufferUsage::Dynamic, SurfaceFormat::R8G8B8A8_Unorm);
-			m_TransferTex->SetFilter(FilterMode::MinMagMipPoint);
+			m_Diffuse = std::make_shared<Texture>();
+			m_Diffuse->Create2D(255, 1, 1, false, BufferUsage::Dynamic, SurfaceFormat::R8G8B8A8_Unorm);
+			m_Diffuse->SetFilter(FilterMode::MinMagMipPoint);
+		}
+
+		if (m_Surface == nullptr)
+		{
+			m_Surface = std::make_shared<Texture>();
+			m_Surface->Create2D(255, 1, 1, false, BufferUsage::Dynamic, SurfaceFormat::R8G8_Unorm);
+			m_Surface->SetFilter(FilterMode::MinMagMipPoint);
 		}
 
 		// Do an initial generation pass?
@@ -166,7 +175,12 @@ public:
 
 	std::shared_ptr<Texture> GetDiffuseTransfer()
 	{
-		return m_TransferTex;
+		return m_Diffuse;
+	}
+
+	std::shared_ptr<Texture> GetSurfaceTransfer()
+	{
+		return m_Surface;
 	}
 
 	void AddNode(TransferNode node)
@@ -182,8 +196,8 @@ public:
 	// Computes the textures for the transfer
 	void GenerateTransferFunction()
 	{
-		Byte* colorData = m_TransferTex->GetData();
-		Uint32 pitch = m_TransferTex->GetRowPitch();
+		Byte* colorData = m_Diffuse->GetData();
+		Byte* surfaceData = m_Surface->GetData();
 
 		// Go throguh each node, accept last one as theres no lerp for it!
 		int pixel = 0;
@@ -195,7 +209,7 @@ public:
 			for (Uint32 j = 0; j < steps; j++)
 			{
 				int colorIndex = pixel * 4;
-				int metalIndex = pitch + (pixel * 4);
+				int metalIndex = pixel * 2;
 
 				float t = (float)j / (float)(steps - 1);
 				TransferNode node = TransferNode::Lerp(m_Nodes[i], m_Nodes[i + 1], t);
@@ -205,16 +219,17 @@ public:
 				colorData[colorIndex + 2] = (Byte)(node.B * 255);
 				colorData[colorIndex + 3] = (Byte)(node.GetOpacity() * 255);
 
-				colorData[metalIndex] = (Byte)(node.Metallic * 255);
-				colorData[metalIndex + 1] = (Byte)(node.Roughness * 255);
-				colorData[metalIndex + 2] = 0;
-				colorData[metalIndex + 3] = 255;
+				surfaceData[metalIndex]		= (Byte)(node.Metallic * 255);
+				surfaceData[metalIndex + 1] = (Byte)(node.Roughness * 255);
+				surfaceData[metalIndex + 2] = 0;
+				surfaceData[metalIndex + 3] = 255;
 				pixel++;
 			}
 		}
 
 		// Update the new data to the GPU
-		m_TransferTex->Apply(true);
+		m_Diffuse->Apply(true);
+		m_Surface->Apply(true);
 		m_Dirty = false;
 	}
 
@@ -227,8 +242,8 @@ public:
 		if (ImGui::CollapsingHeader("Transfer Function"))
 		{
 			ImGui::Separator();
-			ImGui::Image(m_TransferTex->GetTextureResource()->m_SRV, ImVec2(ImGui::GetContentRegionAvail().x, 16), ImVec2(0, 0.0f), ImVec2(1, 0.5f));
-			ImGui::Image(m_TransferTex->GetTextureResource()->m_SRV, ImVec2(ImGui::GetContentRegionAvail().x, 16), ImVec2(0, 0.5f), ImVec2(1, 1));
+			ImGui::Image(m_Diffuse->GetTextureResource()->m_SRV, ImVec2(ImGui::GetContentRegionAvail().x, 16), ImVec2(0, 0.0f), ImVec2(1, 0.5f));
+			ImGui::Image(m_Surface->GetTextureResource()->m_SRV, ImVec2(ImGui::GetContentRegionAvail().x, 16), ImVec2(0, 0.5f), ImVec2(1, 1));
 
 			ImVec2 canvasSize = ImGui::GetContentRegionAvail(); // avliable space
 			canvasSize.y = canvasSize.y * 0.8f; // leave 20% room for button GUI
