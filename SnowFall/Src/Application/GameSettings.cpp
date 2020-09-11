@@ -114,6 +114,11 @@ void GameSettings::SetStero(bool stero)
 	}
 }
 
+bool GameSettings::IsVRS() const
+{
+	return m_IsVairbleRateShading;
+}
+
 void GameSettings::Apply()
 {
 	if (m_RequiresSave)
@@ -143,6 +148,7 @@ void GameSettings::SaveSettings()
 	m_ConfigFile.SetBool("Graphics", "FullScreen", m_IsFullScreen);
 	m_ConfigFile.SetBool("Graphics", "Vsync", m_IsVsync);
 	m_ConfigFile.SetBool("Graphics", "Stero", m_IsStero);
+	m_ConfigFile.SetBool("Graphics", "VRS", m_IsVairbleRateShading);
 	m_ConfigFile.SetFloat("Time", "FixedTimeStep", 0.01333333333f);
 	m_ConfigFile.SetFloat("Time", "TimeScale", 1);
 	m_ConfigFile.Save();
@@ -158,6 +164,7 @@ void GameSettings::LoadSettings()
 	m_IsFullScreen = m_ConfigFile.GetBool("Graphics", "FullScreen", false);
 	m_IsVsync = m_ConfigFile.GetBool("Graphics", "Vsync", true);
 	m_IsStero = m_ConfigFile.GetBool("Graphics", "Stero", false);
+	m_IsVairbleRateShading = m_ConfigFile.GetBool("Graphics", "VRS", false);
 	m_FixedTimeStep = m_ConfigFile.GetFloat("Time", "FixedTimeStep", 0.01333333333f);
 	m_TimeScale = m_ConfigFile.GetFloat("Time", "TimeScale", 1);
 	m_RequiresSave = true;

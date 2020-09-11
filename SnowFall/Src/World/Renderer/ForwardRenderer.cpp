@@ -3,11 +3,13 @@
 #include "Application/Application.h"
 #include "Application/GameSettings.h"
 #include "World/Component/MeshRenderer.h"
+#include "Application/Game.h"
 #include "World/Scene.h"
 
 void ForwardRenderer::Initialize(GraphicsDevice* device)
 {
 	m_GraphicsDevice = device;
+	m_VRManager = Application::game->GetVRManager();
 
 	BaseRenderer::Initialize(device);
 	GameSettings* gameSettings = Application::gameSettings;
@@ -28,11 +30,17 @@ void ForwardRenderer::Initialize(GraphicsDevice* device)
 		m_DepthTargets[0]  = m_GraphicsDevice->CreateDepthTarget((Uint32)resolution.x, (Uint32)resolution.y, DepthFormat::Depth32);
 	}
 
+	if (gameSettings->IsVRS())
+	{
+		m_FoveatedRendering.Initialize(m_GraphicsDevice);
+	}
 }
 
 void ForwardRenderer::Render(Scene* scene)
 {
 	if (scene == nullptr || scene->m_CameraList.size() == 0) { return; }
+
+	GameSettings* settings = Application::gameSettings;
 
 	// Bind Enviroment Maps: sky, irradiance etc.
 	SetEnviromentTextures(scene);
@@ -42,20 +50,32 @@ void ForwardRenderer::Render(Scene* scene)
 	// Render shadows there same for all cameras and eyes(vr)
 
 	// Render scene for both eyes
-	if (Application::gameSettings->GetIsStero())
+	if (settings->GetIsStero())
 	{
 		Vector2 res = m_VRManager->GetResolution();
 		ViewPort viewPort = ViewPort(res.x, res.y);
 		m_GraphicsDevice->BindScissor(0, 0, (Uint32)res.x, (Uint32)res.y);
 		m_GraphicsDevice->BindViewPort(viewPort);
+		m_VRManager->BeginFrame();
+
+		if (settings->IsVRS())
+		{
+			m_FoveatedRendering.EnableFoveatedRendering(NV_VRS_RENDER_MODE_STEREO);
+			m_FoveatedRendering.UpdateGazeData(0.5, 0.5, true);
+			m_FoveatedRendering.LatchGazeData();
+		}
 
 		for (size_t i = 0; i < 2; i++)
 		{
-			m_VRManager->BeginFrame();
 			std::shared_ptr<Camera> camera = scene->m_CameraList[0];
 			camera->SetView(m_VRManager->GetView((Eye)i, camera->m_Transform->World()));
 			camera->SetProjection(m_VRManager->GetProjection((Eye)i));
 			RenderCamera(scene, scene->m_CameraList[0], m_RenderTargets[i], m_DepthTargets[i]);
+		}
+
+		if (settings->IsVRS())
+		{
+			m_FoveatedRendering.DisableFoveatedRendering();
 		}
 
 		m_VRManager->BindTarget(Eye::Left);
@@ -68,9 +88,21 @@ void ForwardRenderer::Render(Scene* scene)
 	}
 	else
 	{
+		if (settings->IsVRS())
+		{
+			m_FoveatedRendering.EnableFoveatedRendering(NV_VRS_RENDER_MODE_MONO);
+			m_FoveatedRendering.UpdateGazeData(0.0f, 0.0f, false);
+			m_FoveatedRendering.LatchGazeData();
+		}
+
 		m_GraphicsDevice->BindDefaultViewPortAndScissor();
 		// just render first camera for testing!
 		RenderCamera(scene, scene->m_CameraList[0], m_RenderTargets[0], m_DepthTargets[0]);//m_RenderTargets[0], m_DepthTargets[0]);
+	
+		if (settings->IsVRS())
+		{
+			m_FoveatedRendering.DisableFoveatedRendering();
+		}
 	}
 
 	// Blits Left eye too the output window
@@ -143,7 +175,7 @@ void ForwardRenderer::DrawRenderQueue(const RenderQueue& renderQueue)
 		objectCB.m_InvWorld = Matrix4::Inverse(objectCB.m_World);
 		objectCB.m_WorldViewProj = renderQueue.m_Camera->GetProjection() * renderQueue.m_Camera->GetView() * objectCB.m_World;
 		objectCB.m_NormalMatrix = Matrix4::Transpose(objectCB.m_InvWorld);
-		objectCB.m_CameraPosLocal = objectCB.m_InvWorld.TransformPoint(renderQueue.m_Camera->m_Transform->World().GetColumn(3));
+		objectCB.m_CameraPosLocal = objectCB.m_InvWorld.TransformPoint(renderQueue.m_Camera->GetPosition());
 		m_GraphicsDevice->UpdateBuffer(m_ConstantBuffers[(Uint32)UniformTypes::Object], (Byte*)&objectCB, sizeof(ObjectConstBuffer));
 
 		renderer->Draw(m_GraphicsDevice);
@@ -173,4 +205,15 @@ void ForwardRenderer::Resize()
 			m_DepthTargets[0] = m_GraphicsDevice->CreateDepthTarget((Uint32)resolution.x, (Uint32)resolution.y, DepthFormat::Depth32);
 		}
 	}
+}
+
+void ForwardRenderer::ShutDown()
+{
+	m_FoveatedRendering.ShutDown();
+
+	if (m_RenderTargets[0].IsValid()) { m_GraphicsDevice->DestroyTexture(m_RenderTargets[0]); }
+	if (m_RenderTargets[1].IsValid()) { m_GraphicsDevice->DestroyTexture(m_RenderTargets[1]); }
+
+	if (m_DepthTargets[0].IsValid()) { m_GraphicsDevice->DestroyTexture(m_DepthTargets[0]); }
+	if (m_DepthTargets[1].IsValid()) { m_GraphicsDevice->DestroyTexture(m_DepthTargets[1]); }
 }

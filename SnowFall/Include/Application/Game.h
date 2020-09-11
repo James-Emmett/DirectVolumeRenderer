@@ -15,13 +15,13 @@ public:
 	Window			m_Window;
 	GraphicsDevice* m_GraphicsDevice = nullptr;
 	ContentManager* m_ContentManager;
+	VR_Manager*		m_VRManager = nullptr;
 	GameSettings    m_GameSettings;
 	Time			m_Time;
 
 private:
 	LogFile			m_LogFile;
 	LogMessageBox	m_LogMessageBox;
-	VR_Manager*		m_VRManager = nullptr;
 	ImGui_Interface	m_ImGui;
 	double			m_Accumulator = 0.0f;
 	bool m_PauseRender = false;

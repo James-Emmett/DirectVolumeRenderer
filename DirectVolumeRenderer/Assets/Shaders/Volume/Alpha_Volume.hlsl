@@ -110,7 +110,7 @@ float4 frag(v2f i) : SV_TARGET
 			src.rgb *= src.a;
 			color = (1.0f - color.a)*src + color;
 			
-			if(color.a > 0.99f)
+			if(color.a > 0.95f)
 			{
 				break;
 			}

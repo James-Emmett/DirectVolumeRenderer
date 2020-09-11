@@ -15,6 +15,7 @@ protected:
 	bool		m_IsVsync = true;
 	bool		m_IsFullScreen = false;
 	bool		m_IsStero = false;
+	bool		m_IsVairbleRateShading = false;
 	bool		m_RequiresSave = true;
 	bool		m_RequiresRestart = false;
 
@@ -35,6 +36,8 @@ public:
 	void		SetFullScreen(bool fullscreen);
 	bool		GetIsStero()const;
 	void		SetStero(bool stero);
+	bool		IsVRS()const;
+	void		SetVRS(bool value);
 
 	void Apply();
 	void SaveSettings();

@@ -249,6 +249,12 @@
     <ClInclude Include="Include\System\FileDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\VR\FoveatedRenderHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VR\D3D\FoveatedRenderHelper_D3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\System\Assert.cpp">
@@ -411,6 +417,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\System\Win32\FileDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\VR\FoveatedRenderHelper_D3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

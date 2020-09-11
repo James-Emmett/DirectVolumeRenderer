@@ -263,11 +263,14 @@ void VolumeComponent::OnGui()
 			{
 				if (m_TransferFunction.DisplayEditor())
 				{
-					if (m_VolumeMethod == VolumeMethod::PBR_ESS)
-					{
-						m_OccupancyGenerator.GenerateVolumeGrid(m_VolumeMap, m_TransferFunction.GetDiffuseTransfer());
-					}
+					m_RequiresUpdate = true;
 				}
+			}
+
+			if (m_VolumeMethod == VolumeMethod::PBR_ESS && m_RequiresUpdate && m_TransferFunction.IsUserInteracting() == false)
+			{
+				m_OccupancyGenerator.GenerateVolumeGrid(m_VolumeMap, m_TransferFunction.GetDiffuseTransfer());
+				m_RequiresUpdate = false;
 			}
 		}
 	}

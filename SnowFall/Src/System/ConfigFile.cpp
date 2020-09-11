@@ -43,7 +43,7 @@ bool ConfigFile::Open(std::string fileName)
 					if (seperator_Pos > 0)
 					{
 						key = line.substr(0, seperator_Pos);
-						value = line.substr(seperator_Pos + 1);
+						value = line.substr((size_t)seperator_Pos + 1);
 						currentSettings->insert(std::make_pair(key, value));
 					}
 				}

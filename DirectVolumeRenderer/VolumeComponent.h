@@ -14,7 +14,7 @@ struct VolumeData
 	float Width = 1;
 	float Height = 1;
 	float Depth = 1;
-	float IsoValue = 0.2f;
+	float IsoValue = 0.01f;
 	float AlphaAmount = 0.5f;
 };
 
@@ -41,6 +41,7 @@ private:
 	Uint32 m_CurrentItem;
 	int dimensions[3];
 	bool m_ShowMetaPop = false;
+	bool m_RequiresUpdate = false;
 
 public:
 	// Sets up the volume materials

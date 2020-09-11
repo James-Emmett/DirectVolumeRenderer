@@ -19,7 +19,7 @@ void Game::Run()
 	LogInfo("Initializing");
 
 	//--Create window and graphics--
-	m_Window.Create(Vector2(m_GameSettings.GetWidth(), m_GameSettings.GetHeight()), false, "Rune");
+	m_Window.Create(Vector2((float)m_GameSettings.GetWidth(), (float)m_GameSettings.GetHeight()), false, "Rune");
 	if (m_GameSettings.GetIsStero())
 	{
 		m_VRManager = new VR_Manager();

@@ -21,6 +21,7 @@ public:
 	virtual void Initialize(GraphicsDevice* device);
 	virtual void Render(Scene* scene) = 0;
 	virtual void Resize()=0;
+	virtual void ShutDown()=0;
 
 protected:
 	void SetConstantBuffers();

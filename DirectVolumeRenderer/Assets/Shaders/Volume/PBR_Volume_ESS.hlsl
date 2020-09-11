@@ -172,9 +172,14 @@ float4 frag(v2f i) : SV_TARGET
 	}
 	
 	// This seems more reliable than checking if we left the volume for some reason?
-	int iteractions = length((ray.End - ray.Start) * _OccupancySize);
+	float iteractions = length((ray.End - ray.Start) * _OccupancySize);
 	for(int j = 0; j <= iteractions; ++j)
-	{	
+	{
+		if(j >= 32)
+		{
+			//return float4(1,1,0,1);
+		}
+		
 		// Finds shortest axis its the next t intersection
 		voxelIncr.x = (t.x <= t.y) && (t.x <= t.z);
 		voxelIncr.y = (t.y <= t.x) && (t.y <= t.z);
@@ -197,8 +202,8 @@ float4 frag(v2f i) : SV_TARGET
 			float3 end = (ray.Start + (t * ray.Dir));
 			
 			// This mathmatically should be the ideal steps for the inner voxel reigon!
-			int innerVoxelSteps = length((start - end)/ _StepSize);
-			for(int j = 0; j < 10; ++j)
+			int innerVoxelSteps = length((end - start)/ _StepSize);
+			for(int j = 0; j < innerVoxelSteps; ++j)
 			{
 				// Sample origional volume with p
 				float4 voxel = _VolumeMap.SampleLevel(_VolumeSampler, start, 0).rgba;

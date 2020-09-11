@@ -55,7 +55,7 @@ void VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Texture> source, std::s
 	if (m_OccupancyMap == nullptr)
 	{
 		m_OccupancyMap = std::make_shared<Texture>();
-		m_OccupancyMap->Create3D(width / 8, height / 8, depth / 8, BufferUsage::Immutable, SurfaceFormat::R8_Unorm);
+		m_OccupancyMap->Create3D(width / 8, height / 8, depth / 8, BufferUsage::Dynamic, SurfaceFormat::R8_Unorm);
 		m_OccupancyMap->SetFilter(FilterMode::MinMagMipPoint);
 		m_OccupancyMap->SetWrapMode(WrapMode::Clamp);
 	}

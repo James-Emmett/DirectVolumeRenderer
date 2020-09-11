@@ -291,7 +291,7 @@ void VR_Manager::BeginFrame()
 		XrQuaternionf& xrQuat = view.pose.orientation;
 
 		Quaternion quat = Quaternion(xrQuat.x, xrQuat.y, -xrQuat.z, xrQuat.w);
-		Vector3 pos = Vector3(xrPos.x, xrPos.y, -xrPos.z);
+		Vector3 pos = Vector3(xrPos.x, xrPos.y, xrPos.z);
 		m_ViewMatrix[i] = Matrix4::Inverse(Matrix4::Rotate(quat) * Matrix4::Translate(pos));
 	}
 

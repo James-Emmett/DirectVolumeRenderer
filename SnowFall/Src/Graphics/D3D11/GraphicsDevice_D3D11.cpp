@@ -990,7 +990,22 @@ void GraphicsDevice::UpdateTexture(const TextureHandle texture, const Byte* data
         D3D11_MAPPED_SUBRESOURCE mappedResource;
         if (SUCCEEDED(m_DeviceContexts[cmd]->Map((ID3D11Resource*)pTexture->m_Resource, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
         {
-            memcpy(mappedResource.pData, data, byteCount);
+            // Set the data and unmap
+            Byte* sptr = (Byte*)data;
+            Byte* dptr = (Byte*)mappedResource.pData;
+            Uint32 rowCount = mappedResource.DepthPitch / mappedResource.RowPitch;
+            Uint32 sliceCount = byteCount / mappedResource.DepthPitch;
+
+            size_t msize = std::min<size_t>(pTexture->m_Desc.Pitch, mappedResource.RowPitch);
+            for (size_t d = 0; d < pTexture->m_Desc.Depth; d++)
+            {
+                for (size_t h = 0; h < rowCount; h++)
+                {
+                    memcpy_s(dptr, pTexture->m_Desc.Pitch, sptr, msize);
+                    dptr += mappedResource.RowPitch;
+                    sptr += pTexture->m_Desc.Pitch;
+                }
+            }
             m_DeviceContexts[cmd]->Unmap((ID3D11Resource*)pTexture->m_Resource, 0);
         }
         else
@@ -1028,7 +1043,7 @@ void GraphicsDevice::GetTextureData(const TextureHandle texture, Byte* data, Uin
     TextureDesc* pDesc = &pTexture->m_Desc;
     HRESULT hr = S_OK;
 
-    // Create staging texture, should pool
+    // Create staging texture, should pool ?
     ID3D11Resource* staging = nullptr;
     if (pDesc->Type == TextureType::Texture1D)
     {

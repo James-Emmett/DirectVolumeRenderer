@@ -101,6 +101,7 @@ private:
 	bool m_CanvasClicked = false;
 	bool m_Dirty = false;
 	bool m_MouseDownPrevious = false;
+	bool m_Interacting = false;
 
 public:
 	void Initialize(std::string path)
@@ -204,7 +205,7 @@ public:
 		for (Uint32 i = 0; i < m_Nodes.size() - 1; i++)
 		{
 			// How many iso values between these nodes, for t value!
-			Uint32 steps = (Uint32)(m_Nodes[i + 1].GetIntensity() - m_Nodes[i].GetIntensity());
+			Uint32 steps = (Uint32)(m_Nodes[(size_t)i + 1].GetIntensity() - m_Nodes[i].GetIntensity());
 
 			for (Uint32 j = 0; j < steps; j++)
 			{
@@ -212,7 +213,7 @@ public:
 				int metalIndex = pixel * 2;
 
 				float t = (float)j / (float)(steps - 1);
-				TransferNode node = TransferNode::Lerp(m_Nodes[i], m_Nodes[i + 1], t);
+				TransferNode node = TransferNode::Lerp(m_Nodes[i], m_Nodes[(size_t)i + 1], t);
 
 				colorData[colorIndex] = (Byte)(node.R * 255);
 				colorData[colorIndex + 1] = (Byte)(node.G * 255);
@@ -231,6 +232,8 @@ public:
 		m_Diffuse->Apply(true);
 		m_Surface->Apply(true);
 		m_Dirty = false;
+		//--for the thesis screenshots--
+		//m_Diffuse->SaveToFile("Assets/diffuse.png");
 	}
 
 	// Returns true if edited in any way and its finsihed editign too
@@ -293,6 +296,7 @@ public:
 
 				if (io.MouseDown[0] == true)
 				{
+					m_Interacting = true;
 					if (m_DraggingNode != -1)
 					{
 						// Only move if moved more than x amount?
@@ -314,13 +318,13 @@ public:
 							else
 							{
 								// Clamp between nodes
-								if (m_Nodes[m_DraggingNode].Intensity <= m_Nodes[m_DraggingNode - 1].Intensity)
+								if (m_Nodes[m_DraggingNode].Intensity <= m_Nodes[(size_t)m_DraggingNode - 1].Intensity)
 								{
-									m_Nodes[m_DraggingNode].Intensity = m_Nodes[m_DraggingNode - 1].Intensity + 5;
+									m_Nodes[m_DraggingNode].Intensity = m_Nodes[(size_t)m_DraggingNode - 1].Intensity + 5;
 								}
-								else if (m_Nodes[m_DraggingNode].Intensity >= m_Nodes[m_DraggingNode + 1].Intensity)
+								else if (m_Nodes[m_DraggingNode].Intensity >= m_Nodes[(size_t)m_DraggingNode + 1].Intensity)
 								{
-									m_Nodes[m_DraggingNode].Intensity = m_Nodes[m_DraggingNode + 1].Intensity - 5;
+									m_Nodes[m_DraggingNode].Intensity = m_Nodes[(size_t)m_DraggingNode + 1].Intensity - 5;
 								}
 							}
 
@@ -344,7 +348,7 @@ public:
 				{
 					m_SelectedNode = GetNodeOverlap(clippedMousePos, viewScale, viewOffset);
 
-					if (m_SelectedNode != -1)
+					if (m_SelectedNode > 0 && m_SelectedNode < m_Nodes.size() - 1)
 					{
 						m_Nodes.erase(m_Nodes.begin() + m_SelectedNode);
 						m_Dirty = true;
@@ -361,6 +365,7 @@ public:
 			else
 			{
 				m_DraggingNode = -1;
+				m_Interacting = false;
 			}
 
 
@@ -428,11 +433,10 @@ public:
 				m_Dirty = false;
 
 				// only return edited if its dirty and we finished?
-				return m_MouseDownPrevious == false;
+				return true;
 			}
-
-			return false;
 		}
+		return false;
 	}
 
 	int GetNodeOverlap(Vector2 mousePosition, Vector2 viewScale, Vector2 viewOffset)
@@ -449,5 +453,10 @@ public:
 		}
 
 		return -1;
+	}
+
+	bool IsUserInteracting()
+	{
+		return m_Interacting;
 	}
 };

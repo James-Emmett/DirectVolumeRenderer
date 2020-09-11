@@ -138,14 +138,15 @@ float4 frag(v2f i) : SV_TARGET
 	float3 stepDelta = ray.Dir 	 * _StepSize;
 
 	// Kind of works???
-	float3 p = rayStart;
+	float random = frac(sin(i.position.x * 12.9898 + i.position.y * 78.233) * 43758.5453);
+	float3 p = rayStart + (stepDelta * random);
 	int iteractions = length((rayEnd - rayStart) * _VolumeSize) / _StepSize;
 	// need a way to determine how many samples should be run.
 	for(int j = 0; j < iteractions; ++j)
 	{
 		// Sample origional volume with p
 		float4 voxel = _VolumeMap.SampleLevel(_VolumeSampler, p, 0).rgba;
-		float4 albedo 	  = _AlbedoTransfer.SampleLevel(_AlbedoSampler, float2(voxel.w, 0), 0);
+		float4 albedo = _AlbedoTransfer.SampleLevel(_AlbedoSampler, float2(voxel.w, 0), 0);
 			
 		// Run shading if intensity is high enough.
 		if(albedo.w > _Hounsfield)
@@ -154,7 +155,10 @@ float4 frag(v2f i) : SV_TARGET
 			float metalness   = surface.r;
 			float roughness   = surface.g;
 			float3 N          = mul(_NormalWorld, float4((2.0 * voxel.rgb - 1.0f), 0.0f)).xyz;
+			float lengthN     = length(N);
 			N *= -1;
+			
+			N = (lengthN == 0) ?  L : N / lengthN;
 			
 			float3 V     = normalize(_CameraPosWorld - i.worldPos.xyz);
 			float3 VR    = normalize(reflect(-V, N));

@@ -162,7 +162,7 @@ Vector3 Camera::ViewPortToWorldPoint(const Vector3& position) const
 
 Vector3 Camera::GetPosition() const
 {
-	return m_Transform->Position();
+	return m_InvView.GetColumn(3);
 }
 
 void Camera::Move(const Vector3& translate)

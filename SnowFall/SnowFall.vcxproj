@@ -127,7 +127,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>openxr_loader.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>openxr_loader.lib;nvapi64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)External\Libs\Windows\$(Platform)\Debug</AdditionalLibraryDirectories>
@@ -215,7 +215,9 @@
     <ClInclude Include="Include\System\Window.h" />
     <ClInclude Include="Include\System\WindowEvent.h" />
     <ClInclude Include="Include\UI\ImGui_Interface.h" />
+    <ClInclude Include="Include\VR\D3D\FoveatedRenderHelper_D3D.h" />
     <ClInclude Include="Include\VR\D3D\VR_Manager_D3D.h" />
+    <ClInclude Include="Include\VR\FoveatedRenderHelper.h" />
     <ClInclude Include="Include\VR\VR_Manager.h" />
     <ClInclude Include="Include\World\Component\Camera.h" />
     <ClInclude Include="Include\World\Component\Component.h" />
@@ -245,6 +247,7 @@
     <ClCompile Include="Src\Content\Texture.cpp" />
     <ClCompile Include="Src\Graphics\VertexTypes.cpp" />
     <ClCompile Include="Src\System\Win32\FileDialog.cpp" />
+    <ClCompile Include="Src\VR\FoveatedRenderHelper_D3D.cpp" />
     <ClCompile Include="Src\World\Component\MeshRenderer.cpp" />
     <ClCompile Include="Src\World\Component\RenderComponent.cpp" />
     <ClCompile Include="Src\World\Renderer\BaseRenderer.cpp" />
