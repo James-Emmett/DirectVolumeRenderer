@@ -1,6 +1,7 @@
 #include "Application/GameSettings.h"
 #include "Application/Application.h"
 #include "Graphics/GraphicsDevice.h"
+#include "VR/FoveatedRenderHelper.h"
 #include "System/ConfigFile.h"
 #include "Application/Game.h"
 
@@ -119,6 +120,51 @@ bool GameSettings::IsVRS() const
 	return m_IsVairbleRateShading;
 }
 
+void GameSettings::SetVRS(bool value)
+{
+	m_IsVairbleRateShading = value;
+}
+
+FoveatedShaderPerformance GameSettings::GetShadingRatePerformance() const
+{
+	return m_ShadingRatePerformance;
+}
+
+void GameSettings::SetShadingRatePerformance(FoveatedShaderPerformance performance)
+{
+	m_ShadingRatePerformance = performance;
+}
+
+FoveatedShadingRate GameSettings::GetInnerRegionRate() const
+{
+	return m_InnerRegionRate;
+}
+
+void GameSettings::SetInnerRegionRate(FoveatedShadingRate shadingRate)
+{
+	m_InnerRegionRate = shadingRate;
+}
+
+FoveatedShadingRate GameSettings::GetOuterRegionRate() const
+{
+	return m_OuterRegionRate;
+}
+
+void GameSettings::SetOuterRegionRate(FoveatedShadingRate shadingRate)
+{
+	m_OuterRegionRate = shadingRate;
+}
+
+FoveatedShadingRate GameSettings::GetMiddleRegionRate() const
+{
+	return m_MiddleRegionRate;
+}
+
+void GameSettings::SetMiddleRegionRate(FoveatedShadingRate shadingRate)
+{
+	m_MiddleRegionRate = shadingRate;
+}
+
 void GameSettings::Apply()
 {
 	if (m_RequiresSave)
@@ -148,9 +194,14 @@ void GameSettings::SaveSettings()
 	m_ConfigFile.SetBool("Graphics", "FullScreen", m_IsFullScreen);
 	m_ConfigFile.SetBool("Graphics", "Vsync", m_IsVsync);
 	m_ConfigFile.SetBool("Graphics", "Stero", m_IsStero);
-	m_ConfigFile.SetBool("Graphics", "VRS", m_IsVairbleRateShading);
 	m_ConfigFile.SetFloat("Time", "FixedTimeStep", 0.01333333333f);
 	m_ConfigFile.SetFloat("Time", "TimeScale", 1);
+	m_ConfigFile.GetBool("VairbleRateShading", "Enabled", m_IsVairbleRateShading);
+	m_ConfigFile.SetString("VairbleRateShading", "ShadingPerformance", FoveatedRenderHelper::ShadingPerformanceTooString(m_ShadingRatePerformance));
+	m_ConfigFile.SetString("VairbleRateShading", "InnerRegion", FoveatedRenderHelper::ShadingRateTooString(m_InnerRegionRate));
+	m_ConfigFile.SetString("VairbleRateShading", "MiddleRegion", FoveatedRenderHelper::ShadingRateTooString(m_MiddleRegionRate));
+	m_ConfigFile.SetString("VairbleRateShading", "OuterRegion", FoveatedRenderHelper::ShadingRateTooString(m_OuterRegionRate));
+	
 	m_ConfigFile.Save();
 	m_RequiresSave = false;
 }
@@ -158,16 +209,23 @@ void GameSettings::SaveSettings()
 void GameSettings::LoadSettings()
 {
 	m_ConfigFile.Open("Assets/settings.cfg");
-	m_AssetPath = m_ConfigFile.GetString("Common", "AssetPath", "Assets/");
-	m_Width = m_ConfigFile.GetInt("Graphics", "Width", 1280);
-	m_Height = m_ConfigFile.GetInt("Graphics", "Height", 720);
-	m_IsFullScreen = m_ConfigFile.GetBool("Graphics", "FullScreen", false);
-	m_IsVsync = m_ConfigFile.GetBool("Graphics", "Vsync", true);
-	m_IsStero = m_ConfigFile.GetBool("Graphics", "Stero", false);
-	m_IsVairbleRateShading = m_ConfigFile.GetBool("Graphics", "VRS", false);
+	m_AssetPath		= m_ConfigFile.GetString("Common", "AssetPath", "Assets/");
+	m_Width			= m_ConfigFile.GetInt("Graphics", "Width", 1280);
+	m_Height		= m_ConfigFile.GetInt("Graphics", "Height", 720);
+	m_IsFullScreen	= m_ConfigFile.GetBool("Graphics", "FullScreen", false);
+	m_IsVsync		= m_ConfigFile.GetBool("Graphics", "Vsync", true);
+	m_IsStero		= m_ConfigFile.GetBool("Graphics", "Stero", false);
 	m_FixedTimeStep = m_ConfigFile.GetFloat("Time", "FixedTimeStep", 0.01333333333f);
-	m_TimeScale = m_ConfigFile.GetFloat("Time", "TimeScale", 1);
-	m_RequiresSave = true;
+	m_TimeScale		= m_ConfigFile.GetFloat("Time", "TimeScale", 1);
+
+	//--Vairble Rate Shading--
+	m_IsVairbleRateShading	 = m_ConfigFile.GetBool("VairbleRateShading", "Enabled", false);
+	m_ShadingRatePerformance = FoveatedRenderHelper::ShadingPerformanceFromString(m_ConfigFile.GetString("VairbleRateShading", "ShadingPerformance", FoveatedRenderHelper::ShadingPerformanceTooString(FoveatedShaderPerformance::Balanced)));
+	m_InnerRegionRate = FoveatedRenderHelper::ShadingRateFromString(m_ConfigFile.GetString("VairbleRateShading", "InnerRegion", FoveatedRenderHelper::ShadingRateTooString(FoveatedShadingRate::Pixel_X1_Per_Raster_Pixels)));
+	m_MiddleRegionRate = FoveatedRenderHelper::ShadingRateFromString(m_ConfigFile.GetString("VairbleRateShading", "MiddleRegion", FoveatedRenderHelper::ShadingRateTooString(FoveatedShadingRate::Pixel_X1_Per_2X2_Raster_Pixels)));
+	m_OuterRegionRate = FoveatedRenderHelper::ShadingRateFromString(m_ConfigFile.GetString("VairbleRateShading", "OuterRegion", FoveatedRenderHelper::ShadingRateTooString(FoveatedShadingRate::Pixel_X1_Per_4X4_Raster_Pixels)));
+
+	m_RequiresSave	= true;
 }
 
 GraphicsParameters GameSettings::PrepareParameters() const

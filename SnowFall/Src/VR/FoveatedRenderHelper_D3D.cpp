@@ -34,7 +34,36 @@
 
 #include "VR/FoveatedRenderHelper.h"
 #include "Graphics/GraphicsDevice.h"
+#include "Application/Application.h"
+#include "Application/GameSettings.h"
 #include "System/Logger.h"
+
+std::string FoveatedRenderHelper::s_ShaderPerformanceTable[6] =
+{
+    "Highest_Performance",
+    "High_Performance",
+    "Balanced",
+    "High_Quality",
+    "Highest_Quality",
+    "Custom"
+};
+
+
+std::string FoveatedRenderHelper::s_ShaderRateTable[12] =
+{
+    "Pixel_X0_Cull_Raster_Pixels",
+    "Pixel_X16_Per_Raster_Pixel",
+    "Pixel_X8_Per_Raster_Pixels",
+    "Pixel_X4_Per_Raster_Pixels",
+    "Pixel_X2_Per_Raster_Pixels",
+    "Pixel_X1_Per_Raster_Pixels",
+    "Pixel_X1_Per_2X1_Raster_Pixels",
+    "Pixel_X1_Per_1X2_Raster_Pixels",
+    "Pixel_X1_Per_2X2_Raster_Pixels",
+    "Pixel_X1_Per_4X2_Raster_Pixels",
+    "Pixel_X1_Per_2X4_Raster_Pixels",
+    "Pixel_X1_Per_4X4_Raster_Pixels"
+};
 
 
 FoveatedRenderHelper::FoveatedRenderHelper()
@@ -80,11 +109,11 @@ bool FoveatedRenderHelper::Initialize(GraphicsDevice* device)
     m_enableParams.sFoveatedRenderingDesc.FoveationPatternCustomPresetDesc.fPeripheralRadii[1] = 0.3f;
 
     // Defaults for shading presets
-    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.InnerMostRegionShadingRate = NV_PIXEL_X1_PER_RASTER_PIXEL;
-    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.MiddleRegionShadingRate = NV_PIXEL_X1_PER_2X2_RASTER_PIXELS;
-    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.PeripheralRegionShadingRate = NV_PIXEL_X1_PER_4X4_RASTER_PIXELS;
+    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.InnerMostRegionShadingRate  = (NV_PIXEL_SHADING_RATE)Application::gameSettings->GetInnerRegionRate();
+    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.MiddleRegionShadingRate     = (NV_PIXEL_SHADING_RATE)Application::gameSettings->GetMiddleRegionRate();
+    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.PeripheralRegionShadingRate = (NV_PIXEL_SHADING_RATE)Application::gameSettings->GetOuterRegionRate();
 
-    m_enableParams.sFoveatedRenderingDesc.ShadingRatePreset = NV_FOVEATED_RENDERING_SHADING_RATE_PRESET_HIGHEST_PERFORMANCE;
+    SetShadingRatePerformance(Application::gameSettings->GetShadingRatePerformance());
 
     static NvAPI_Status NvStatus = NVAPI_OK;
     static bool bNvFoveatedRenderingUnsupported = false;
@@ -165,10 +194,18 @@ void FoveatedRenderHelper::LatchGazeData()
 
 void FoveatedRenderHelper::EnableFoveatedRendering(NV_VRS_RENDER_MODE renderMode)
 {
+
     NvAPI_Status NvStatus = NVAPI_OK;
 
     if (m_initialized && m_pVRSHelper)
     {
+        // Update with settings
+        m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.InnerMostRegionShadingRate = (NV_PIXEL_SHADING_RATE)Application::gameSettings->GetInnerRegionRate();
+        m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.MiddleRegionShadingRate = (NV_PIXEL_SHADING_RATE)Application::gameSettings->GetMiddleRegionRate();
+        m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.PeripheralRegionShadingRate = (NV_PIXEL_SHADING_RATE)Application::gameSettings->GetOuterRegionRate();
+
+        SetShadingRatePerformance(Application::gameSettings->GetShadingRatePerformance());
+
         m_enableParams.RenderMode = renderMode;
         NvStatus = m_pVRSHelper->Enable(m_GraphicsDevice->GetImmediateContext(), &m_enableParams);
     }
@@ -303,6 +340,49 @@ void FoveatedRenderHelper::GetShadingRateResource()
     }
 }
 
+void FoveatedRenderHelper::SetShadingRatePerformance(FoveatedShaderPerformance quality)
+{
+    switch (quality)
+    {
+    case FoveatedShaderPerformance::Highest_Performance:
+        m_enableParams.sFoveatedRenderingDesc.ShadingRatePreset = NV_FOVEATED_RENDERING_SHADING_RATE_PRESET_HIGHEST_PERFORMANCE;
+    break;
+    case FoveatedShaderPerformance::High_Performance:
+        m_enableParams.sFoveatedRenderingDesc.ShadingRatePreset = NV_FOVEATED_RENDERING_SHADING_RATE_PRESET_HIGH_PERFORMANCE;
+    break;
+    case FoveatedShaderPerformance::Balanced:
+        m_enableParams.sFoveatedRenderingDesc.ShadingRatePreset = NV_FOVEATED_RENDERING_SHADING_RATE_PRESET_BALANCED;
+    break;
+    case FoveatedShaderPerformance::High_Quality:
+        m_enableParams.sFoveatedRenderingDesc.ShadingRatePreset = NV_FOVEATED_RENDERING_SHADING_RATE_PRESET_HIGH_QUALITY;
+    break;
+    case FoveatedShaderPerformance::Highest_Quality:
+        m_enableParams.sFoveatedRenderingDesc.ShadingRatePreset = NV_FOVEATED_RENDERING_SHADING_RATE_PRESET_HIGHEST_QUALITY;
+    break;
+    case FoveatedShaderPerformance::Custom:
+        m_enableParams.sFoveatedRenderingDesc.ShadingRatePreset = NV_FOVEATED_RENDERING_SHADING_RATE_PRESET_CUSTOM;
+    break;
+    default:
+        m_enableParams.sFoveatedRenderingDesc.ShadingRatePreset = NV_FOVEATED_RENDERING_SHADING_RATE_PRESET_HIGHEST_PERFORMANCE;
+        break;
+    }
+}
+
+void FoveatedRenderHelper::SetInnerRegionShadingRate(FoveatedShadingRate shadingRate)
+{
+    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.InnerMostRegionShadingRate = (NV_PIXEL_SHADING_RATE)shadingRate;
+}
+
+void FoveatedRenderHelper::SetMiddleRegionShadingRate(FoveatedShadingRate shadingRate)
+{
+    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.MiddleRegionShadingRate = (NV_PIXEL_SHADING_RATE)shadingRate;
+}
+
+void FoveatedRenderHelper::SetOuterRegionShadingRate(FoveatedShadingRate shadingRate)
+{
+    m_enableParams.sFoveatedRenderingDesc.ShadingRateCustomPresetDesc.PeripheralRegionShadingRate = (NV_PIXEL_SHADING_RATE)shadingRate;
+}
+
 void FoveatedRenderHelper::ShutDown()
 {
     if (m_initialized)
@@ -324,4 +404,43 @@ void FoveatedRenderHelper::ShutDown()
         m_pGazeHandler->Release();
         m_pVRSHelper->Release();
     }
+}
+
+FoveatedShaderPerformance FoveatedRenderHelper::ShadingPerformanceFromString(std::string string)
+{
+    for (size_t i = 0; i < 5; i++)
+    {
+        if (string == s_ShaderPerformanceTable[i])
+        {
+            // Starts from 1
+            return (FoveatedShaderPerformance)(i);
+        }
+    }
+
+    return FoveatedShaderPerformance::Balanced;
+}
+
+std::string FoveatedRenderHelper::ShadingPerformanceTooString(FoveatedShaderPerformance shadingRate)
+{
+    return s_ShaderPerformanceTable[(int)shadingRate];
+}
+
+FoveatedShadingRate FoveatedRenderHelper::ShadingRateFromString(std::string string)
+{
+    for (size_t i = 0; i < 12; i++)
+    {
+        if (string == s_ShaderRateTable[i])
+        {
+            // Starts from 1
+            return (FoveatedShadingRate)(i);
+        }
+    }
+
+    // Native
+    return FoveatedShadingRate::Pixel_X1_Per_Raster_Pixels;
+}
+
+std::string FoveatedRenderHelper::ShadingRateTooString(FoveatedShadingRate shadingRate)
+{
+    return s_ShaderRateTable[(int)shadingRate];
 }

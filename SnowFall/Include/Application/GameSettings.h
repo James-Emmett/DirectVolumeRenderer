@@ -1,5 +1,6 @@
 #pragma once
 #include "System/ConfigFile.h"
+#include "VR/FoveatedRenderHelper.h"
 
 class Game;
 struct GraphicsParameters;
@@ -18,6 +19,11 @@ protected:
 	bool		m_IsVairbleRateShading = false;
 	bool		m_RequiresSave = true;
 	bool		m_RequiresRestart = false;
+
+	FoveatedShaderPerformance m_ShadingRatePerformance;
+	FoveatedShadingRate		  m_InnerRegionRate;
+	FoveatedShadingRate		  m_OuterRegionRate;
+	FoveatedShadingRate		  m_MiddleRegionRate;
 
 public:
 	std::string GetAssetPath()const;
@@ -38,6 +44,14 @@ public:
 	void		SetStero(bool stero);
 	bool		IsVRS()const;
 	void		SetVRS(bool value);
+	FoveatedShaderPerformance GetShadingRatePerformance()const;
+	void					  SetShadingRatePerformance(FoveatedShaderPerformance performance);
+	FoveatedShadingRate		  GetInnerRegionRate()const;
+	void					  SetInnerRegionRate(FoveatedShadingRate shadingRate);
+	FoveatedShadingRate		  GetOuterRegionRate()const;
+	void					  SetOuterRegionRate(FoveatedShadingRate shadingRate);
+	FoveatedShadingRate		  GetMiddleRegionRate()const;
+	void					  SetMiddleRegionRate(FoveatedShadingRate shadingRate);
 
 	void Apply();
 	void SaveSettings();

@@ -2,6 +2,7 @@
 #include "Application/Game.h"
 #include "Application/Application.h"
 #include "imgui/icons_font_awesome.h"
+#include "Application/GameSettings.h"
 
 #ifdef D3D11
 #include "imgui/imgui_impl_dx11.h"
@@ -123,6 +124,94 @@ void ImGui_Interface::OnGui()
 		}
 
 		settings->Apply();
+
+		ImGui::Separator();
+
+		bool vrs = settings->IsVRS();
+		if (ImGui::Checkbox("Enable VRS: ", &vrs))
+		{
+			settings->SetVRS(vrs);
+		}
+
+		//--Shader Performance DropDown--
+		if (ImGui::BeginCombo("ShaderPerformance", FoveatedRenderHelper::s_ShaderPerformanceTable[(int)settings->GetShadingRatePerformance()].c_str()))
+		{
+			for (Uint32 n = 0; n < IM_ARRAYSIZE(FoveatedRenderHelper::s_ShaderPerformanceTable); n++)
+			{
+				bool is_selected = ((Uint32)settings->GetShadingRatePerformance() == n);
+				if (ImGui::Selectable(FoveatedRenderHelper::s_ShaderPerformanceTable[n].c_str(), is_selected))
+				{
+					settings->SetShadingRatePerformance((FoveatedShaderPerformance)n);
+				}
+
+				if (is_selected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		if (settings->GetShadingRatePerformance() == FoveatedShaderPerformance::Custom)
+		{
+			//--Inner Shader Rate DropDown--
+			if (ImGui::BeginCombo("InnerRate", FoveatedRenderHelper::s_ShaderRateTable[(int)settings->GetInnerRegionRate()].c_str()))
+			{
+				for (Uint32 n = 0; n < IM_ARRAYSIZE(FoveatedRenderHelper::s_ShaderRateTable); n++)
+				{
+					bool is_selected = ((Uint32)settings->GetInnerRegionRate() == n);
+					if (ImGui::Selectable(FoveatedRenderHelper::s_ShaderRateTable[n].c_str(), is_selected))
+					{
+						settings->SetInnerRegionRate((FoveatedShadingRate)n);
+					}
+
+					if (is_selected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
+
+			//--Middle Shader Rate DropDown--
+			if (ImGui::BeginCombo("MiddleRate", FoveatedRenderHelper::s_ShaderRateTable[(int)settings->GetMiddleRegionRate()].c_str()))
+			{
+				for (Uint32 n = 0; n < IM_ARRAYSIZE(FoveatedRenderHelper::s_ShaderRateTable); n++)
+				{
+					bool is_selected = ((Uint32)settings->GetMiddleRegionRate() == n);
+					if (ImGui::Selectable(FoveatedRenderHelper::s_ShaderRateTable[n].c_str(), is_selected))
+					{
+						settings->SetMiddleRegionRate((FoveatedShadingRate)n);
+					}
+
+					if (is_selected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
+
+			//--Outer Shader Rate DropDown--
+			if (ImGui::BeginCombo("OuterRate", FoveatedRenderHelper::s_ShaderRateTable[(int)settings->GetOuterRegionRate()].c_str()))
+			{
+				for (Uint32 n = 0; n < IM_ARRAYSIZE(FoveatedRenderHelper::s_ShaderRateTable); n++)
+				{
+					bool is_selected = ((Uint32)settings->GetOuterRegionRate() == n);
+					if (ImGui::Selectable(FoveatedRenderHelper::s_ShaderRateTable[n].c_str(), is_selected))
+					{
+						settings->SetOuterRegionRate((FoveatedShadingRate)n);
+					}
+
+					if (is_selected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
+		}
+
 		ImGui::End();
 	}
 }

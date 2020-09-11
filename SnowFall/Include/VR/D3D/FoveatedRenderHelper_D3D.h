@@ -35,6 +35,7 @@
 
 #include "d3d11.h"
 #include "Nvapi/nvapi.h"
+#include <string>
 
 #ifndef NV_SHADER_EXTN_SLOT_NUMBER
 #define NV_SHADER_EXTN_SLOT_NUMBER 7
@@ -52,6 +53,32 @@ enum class FoveatedRenderSupport
     Unkown = 0,
     Not_Supported = 1,
     Supported = 2,
+};
+
+enum class FoveatedShaderPerformance
+{
+   Highest_Performance,
+   High_Performance,
+   Balanced,
+   High_Quality,
+   Highest_Quality,
+   Custom
+};
+
+enum class FoveatedShadingRate
+{
+   Pixel_X0_Cull_Raster_Pixels,         // No shading, tiles are culled
+   Pixel_X16_Per_Raster_Pixel,          // 16 shading passes per 1 raster pixel
+   Pixel_X8_Per_Raster_Pixels,           //  8 shading passes per 1 raster pixel
+   Pixel_X4_Per_Raster_Pixels,           //  4 shading passes per 1 raster pixel
+   Pixel_X2_Per_Raster_Pixels,           //  2 shading passes per 1 raster pixel
+   Pixel_X1_Per_Raster_Pixels,           //  Per-pixel shading
+   Pixel_X1_Per_2X1_Raster_Pixels,      //  1 shading pass per  2 raster pixels
+   Pixel_X1_Per_1X2_Raster_Pixels,      //  1 shading pass per  2 raster pixels
+   Pixel_X1_Per_2X2_Raster_Pixels,      //  1 shading pass per  4 raster pixels
+   Pixel_X1_Per_4X2_Raster_Pixels,      //  1 shading pass per  8 raster pixels
+   Pixel_X1_Per_2X4_Raster_Pixels,      //  1 shading pass per  8 raster pixels
+   Pixel_X1_Per_4X4_Raster_Pixels       //  1 shading pass per 16 raster pixels
 };
 
 class GraphicsDevice;
@@ -76,6 +103,11 @@ public:
     FoveatedRenderEyeTracking                       m_eyeTrackingMode;
     FoveatedRenderSupport                           m_foveatedRenderingSupport;
 
+    static std::string s_ShaderPerformanceTable[6];
+    static std::string s_ShaderRateTable[12];
+
+public:
+
     FoveatedRenderHelper();
     ~FoveatedRenderHelper();
 
@@ -86,5 +118,20 @@ public:
     void UpdateGazeData(float GazeNormX, float GazeNormY, bool bStereoSplit);
     void PurgeInternalVRSResources();
     void GetShadingRateResource();
+    void SetShadingRatePerformance(FoveatedShaderPerformance quality);
+    void SetInnerRegionShadingRate(FoveatedShadingRate shadingRate);
+    void SetMiddleRegionShadingRate(FoveatedShadingRate shadingRate);
+    void SetOuterRegionShadingRate(FoveatedShadingRate shadingRate);
     void ShutDown();
+
+    // Convert Performance string too enum
+    static FoveatedShaderPerformance ShadingPerformanceFromString(std::string string);
+    // Get shading Performance as a string
+    static std::string ShadingPerformanceTooString(FoveatedShaderPerformance shadingRate);
+
+
+    // Convert Performance string too enum
+    static FoveatedShadingRate ShadingRateFromString(std::string string);
+    // Get shading Performance as a string
+    static std::string ShadingRateTooString(FoveatedShadingRate shadingRate);
 };
