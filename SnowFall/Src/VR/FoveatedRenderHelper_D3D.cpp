@@ -95,6 +95,8 @@ FoveatedRenderHelper::~FoveatedRenderHelper()
 
 bool FoveatedRenderHelper::Initialize(GraphicsDevice* device)
 {
+    if (m_initialized) { return true; }
+
     m_GraphicsDevice = device;
 
     // Pattern preset

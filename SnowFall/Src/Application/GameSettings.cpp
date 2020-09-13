@@ -123,6 +123,11 @@ bool GameSettings::IsVRS() const
 void GameSettings::SetVRS(bool value)
 {
 	m_IsVairbleRateShading = value;
+
+	if (value)
+	{
+		Application::game->GetFoveatedHelper()->Initialize(Application::graphicsDevice);
+	}
 }
 
 FoveatedShaderPerformance GameSettings::GetShadingRatePerformance() const

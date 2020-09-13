@@ -10,6 +10,7 @@ void ForwardRenderer::Initialize(GraphicsDevice* device)
 {
 	m_GraphicsDevice = device;
 	m_VRManager = Application::game->GetVRManager();
+	m_FoveatedRendering = Application::game->GetFoveatedHelper();
 
 	BaseRenderer::Initialize(device);
 	GameSettings* gameSettings = Application::gameSettings;
@@ -28,11 +29,6 @@ void ForwardRenderer::Initialize(GraphicsDevice* device)
 	{
 		m_RenderTargets[0] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R8G8B8A8_Unorm);
 		m_DepthTargets[0]  = m_GraphicsDevice->CreateDepthTarget((Uint32)resolution.x, (Uint32)resolution.y, DepthFormat::Depth32);
-	}
-
-	if (gameSettings->IsVRS())
-	{
-		m_FoveatedRendering.Initialize(m_GraphicsDevice);
 	}
 }
 
@@ -60,9 +56,9 @@ void ForwardRenderer::Render(Scene* scene)
 
 		if (settings->IsVRS())
 		{
-			m_FoveatedRendering.EnableFoveatedRendering(NV_VRS_RENDER_MODE_STEREO);
-			m_FoveatedRendering.UpdateGazeData(0.5, 0.5, true);
-			m_FoveatedRendering.LatchGazeData();
+			m_FoveatedRendering->EnableFoveatedRendering(NV_VRS_RENDER_MODE_STEREO);
+			m_FoveatedRendering->UpdateGazeData(0.5, 0.5, true);
+			m_FoveatedRendering->LatchGazeData();
 		}
 
 		for (size_t i = 0; i < 2; i++)
@@ -75,7 +71,7 @@ void ForwardRenderer::Render(Scene* scene)
 
 		if (settings->IsVRS())
 		{
-			m_FoveatedRendering.DisableFoveatedRendering();
+			m_FoveatedRendering->DisableFoveatedRendering();
 		}
 
 		m_VRManager->BindTarget(Eye::Left);
@@ -90,9 +86,9 @@ void ForwardRenderer::Render(Scene* scene)
 	{
 		if (settings->IsVRS())
 		{
-			m_FoveatedRendering.EnableFoveatedRendering(NV_VRS_RENDER_MODE_MONO);
-			m_FoveatedRendering.UpdateGazeData(0.0f, 0.0f, false);
-			m_FoveatedRendering.LatchGazeData();
+			m_FoveatedRendering->EnableFoveatedRendering(NV_VRS_RENDER_MODE_MONO);
+			m_FoveatedRendering->UpdateGazeData(0.0f, 0.0f, false);
+			m_FoveatedRendering->LatchGazeData();
 		}
 
 		m_GraphicsDevice->BindDefaultViewPortAndScissor();
@@ -101,7 +97,7 @@ void ForwardRenderer::Render(Scene* scene)
 	
 		if (settings->IsVRS())
 		{
-			m_FoveatedRendering.DisableFoveatedRendering();
+			m_FoveatedRendering->DisableFoveatedRendering();
 		}
 	}
 
@@ -209,8 +205,6 @@ void ForwardRenderer::Resize()
 
 void ForwardRenderer::ShutDown()
 {
-	m_FoveatedRendering.ShutDown();
-
 	if (m_RenderTargets[0].IsValid()) { m_GraphicsDevice->DestroyTexture(m_RenderTargets[0]); }
 	if (m_RenderTargets[1].IsValid()) { m_GraphicsDevice->DestroyTexture(m_RenderTargets[1]); }
 

@@ -360,8 +360,8 @@ void VR_Manager::ShutDown()
 {
 	for (size_t i = 0; i < m_SwapChains.size(); i++)
 	{
-		m_SwapChains[i].Release();
 		xrDestroySwapchain(m_SwapChains[i].m_Handle);
+		m_SwapChains[i].Release();
 	}
 
 	m_SwapChains.clear();

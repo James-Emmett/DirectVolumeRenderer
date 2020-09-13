@@ -7,7 +7,7 @@ class ForwardRenderer : public BaseRenderer
 public:
 	RenderHandle m_RenderTargets[2];
 	DepthHandle  m_DepthTargets[2];
-	FoveatedRenderHelper m_FoveatedRendering;
+	FoveatedRenderHelper* m_FoveatedRendering;
 
 public:
 	void Initialize(GraphicsDevice* manager);

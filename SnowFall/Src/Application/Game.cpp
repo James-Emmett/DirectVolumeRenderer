@@ -100,9 +100,12 @@ void Game::Exit()
 	{
 		m_VRManager->ShutDown();
 	}
+
+	m_FoveatedRendering.ShutDown();
 	m_ImGui.ShutDown();
 	m_GraphicsDevice->ShutDown();
 	m_GameSettings.SaveSettings();
+	LogHandler::FlushObervers();
 	m_Window.Close();
 	exit(0);
 }
@@ -115,4 +118,9 @@ GameSettings* Game::GetGameSettings()
 VR_Manager* Game::GetVRManager()
 {
 	return m_VRManager;
+}
+
+FoveatedRenderHelper* Game::GetFoveatedHelper()
+{
+	return &m_FoveatedRendering;
 }

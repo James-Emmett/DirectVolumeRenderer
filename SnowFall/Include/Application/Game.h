@@ -8,29 +8,34 @@
 #include "UI/ImGui_Interface.h"
 #include "Input/Input.h"
 #include "Content/ContentManager.h"
+#include "VR/FoveatedRenderHelper.h"
 
 class Game
 {
 public:
 	Window			m_Window;
-	GraphicsDevice* m_GraphicsDevice = nullptr;
 	ContentManager* m_ContentManager;
-	VR_Manager*		m_VRManager = nullptr;
 	GameSettings    m_GameSettings;
 	Time			m_Time;
+
+	// I think i need Graphics Manager back for these!!!
+	GraphicsDevice*		 m_GraphicsDevice = nullptr;
+	VR_Manager*			 m_VRManager = nullptr;
+	FoveatedRenderHelper m_FoveatedRendering;
 
 private:
 	LogFile			m_LogFile;
 	LogMessageBox	m_LogMessageBox;
 	ImGui_Interface	m_ImGui;
 	double			m_Accumulator = 0.0f;
-	bool m_PauseRender = false;
+	bool			m_PauseRender = false;
 
 public:
 	void Run();
 	void Exit();
 	GameSettings* GetGameSettings();
 	VR_Manager*	  GetVRManager();
+	FoveatedRenderHelper* GetFoveatedHelper();
 
 public:
 	virtual void Initialize() = 0;

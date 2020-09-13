@@ -202,7 +202,7 @@ float4 frag(v2f i) : SV_TARGET
 			float3 end = (ray.Start + (t * ray.Dir));
 			
 			// This mathmatically should be the ideal steps for the inner voxel reigon!
-			int innerVoxelSteps = length((end - start)/ _StepSize);
+			int innerVoxelSteps = length((end - start))/ _StepSize;
 			for(int j = 0; j < innerVoxelSteps; ++j)
 			{
 				// Sample origional volume with p
