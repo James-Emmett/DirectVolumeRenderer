@@ -1,4 +1,6 @@
 #include "World/Renderer/BaseRenderer.h"
+#include "World/Renderer/PostProcess/PostProcessor.h"
+#include "Graphics/RenderTargetPool.h"
 #include "Application/Application.h"
 #include "World/Component/Camera.h"
 #include "Application/Game.h"
@@ -7,7 +9,6 @@
 
 void BaseRenderer::Initialize(GraphicsDevice* device)
 {
-	m_Blitter.Initialize(device, Application::contentManager);
 	m_ConstantBuffers[(Uint32)UniformTypes::Frame]  = m_GraphicsDevice->CreateConstantBuffer(sizeof(FrameConstBuffer), nullptr);
 	m_ConstantBuffers[(Uint32)UniformTypes::Camera] = m_GraphicsDevice->CreateConstantBuffer(sizeof(CameraConstBuffer), nullptr);
 	m_ConstantBuffers[(Uint32)UniformTypes::Object] = m_GraphicsDevice->CreateConstantBuffer(sizeof(ObjectConstBuffer), nullptr);
@@ -56,4 +57,36 @@ void BaseRenderer::SetEnviromentTextures(Scene* scene)
 void BaseRenderer::DrawSkybox(Scene* scene, std::shared_ptr<Camera> camera)
 {
 	scene->m_RenderSettings.m_SkyBox.Draw(camera->GetView(), camera->GetProjection());
+}
+
+void BaseRenderer::RenderPostProcess(Scene* scene, RenderHandle target)
+{
+	std::vector<std::shared_ptr<PostProcessor>>& list = scene->m_PostProcessors;
+	GameSettings* settings = Application::gameSettings;
+
+	RenderHandle auxiliary = RenderTargetPool::GetTempoary(settings->GetWidth(), settings->GetHeight());
+
+	// Do HDR Post Proc
+	Uint32 counter = 0;
+	bool even = true;
+	for (size_t i = 0; i < list.size(); i++)
+	{
+		if (list[i]->m_Enabled)
+		{
+			even = Mathf::IsEven(counter);
+			counter++;
+
+			RenderHandle source = (even == true) ? target : auxiliary;
+			RenderHandle destination = (even == false) ? target : auxiliary;
+			list[i]->Apply(source, destination);
+		}
+	}
+
+	// Find a nicer way, extra blit is :/
+	if (even == false)
+	{
+		m_GraphicsDevice->BlitToBuffer(auxiliary, target);
+	}
+
+	RenderTargetPool::ReleaseTempoary(auxiliary);
 }

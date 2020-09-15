@@ -18,7 +18,7 @@
 	</Attributes>
 	
 	<Shaders>
-		<ShaderPath type="VS" source="Shaders/PostProcess/tonemap.hlsl" entry="vert"/>
-		<ShaderPath type="FS" source="Shaders/PostProcess/tonemap.hlsl" entry="frag"/>
+		<ShaderPath type="VS" source="Assets/Shaders/PostProcess/tonemap.hlsl" entry="vert"/>
+		<ShaderPath type="FS" source="Assets/Shaders/PostProcess/tonemap.hlsl" entry="frag"/>
 	</Shaders>
 </Shader>

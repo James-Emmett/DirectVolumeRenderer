@@ -1,5 +1,6 @@
 #include "Application/Game.h"
 #include "Application/Application.h"
+#include "Graphics/RenderTargetPool.h"
 
 void Game::Run()
 {
@@ -96,6 +97,8 @@ void Game::Run()
 void Game::Exit()
 {
 	ShutDown();
+	RenderTargetPool::ShutDown();
+
 	if (m_VRManager)
 	{
 		m_VRManager->ShutDown();

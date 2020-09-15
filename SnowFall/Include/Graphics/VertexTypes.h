@@ -25,6 +25,18 @@ struct Vertex
 	static const InputElement InputLayout[1];
 };
 
+struct VertexTexture
+{
+	Vector3 m_Position;
+	Vector2 m_Texture;
+	bool operator==(const VertexTexture& vertex)const
+	{
+		return m_Position == vertex.m_Position && m_Texture == vertex.m_Texture;
+	}
+
+	static const InputElement InputLayout[2];
+};
+
 struct VertexColorTexture
 {
 	Vector3 m_Position;

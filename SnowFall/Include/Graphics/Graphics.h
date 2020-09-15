@@ -354,7 +354,8 @@ enum class TextureType
 enum class VertexType
 {
 	Vertex = 12,
-	VertexColorTexture = 32,
+	VertexTexture = 20,
+	VertexColorTexture = 36,
 	VertexNormal = 48,
 	VertexMesh = 64,
 	VertexSkimmedMesh = 92

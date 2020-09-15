@@ -352,16 +352,16 @@ private:
     const GraphicsAdapter* m_Adapter = nullptr; // Adapter this device is running on.
 
     //--Core D3D Objects--
-    ID3D11Device* m_Device = nullptr;
-    IDXGISwapChain3* m_SwapChain = nullptr;
-    IDXGIFactory6* m_Factory = nullptr;
-    ID3D11Debug* m_Debug = nullptr;
+    ID3D11Device*           m_Device = nullptr;
+    IDXGISwapChain3*        m_SwapChain = nullptr;
+    IDXGIFactory6*          m_Factory = nullptr;
+    ID3D11Debug*            m_Debug = nullptr;
     ID3D11RenderTargetView* m_RenderTarget = nullptr;
     ID3D11DepthStencilView* m_DepthTarget = nullptr;
-    ID3D11Texture2D* m_BackBuffer = nullptr;
+    ID3D11Texture2D*        m_BackBuffer = nullptr;
     D3D_FEATURE_LEVEL		m_FeatureLevel = D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_0;
-    ID3D11DeviceContext* m_DeviceContexts[COMMANDLIST_COUNT];
-    ID3D11CommandList* m_CommandLists[COMMANDLIST_COUNT];
+    ID3D11DeviceContext*    m_DeviceContexts[COMMANDLIST_COUNT];
+    ID3D11CommandList*      m_CommandLists[COMMANDLIST_COUNT];
 
     //--Settings/Data--
     Uint32	m_FrameCount = 0;
@@ -372,19 +372,19 @@ private:
     Uint32  m_CommandListCount = 1;
 
     // Previous Bound Resources Per Frame.
-    ID3D11VertexShader* m_PrevVertexShader[COMMANDLIST_COUNT] = { nullptr };
-    ID3D11PixelShader* m_PrevPixelShader[COMMANDLIST_COUNT] = { nullptr };
-    ID3D11HullShader* m_PrevHullShader[COMMANDLIST_COUNT] = { nullptr };
-    ID3D11DomainShader* m_PrevDomainShader[COMMANDLIST_COUNT] = { nullptr };
-    ID3D11GeometryShader* m_PrevGeometryShader[COMMANDLIST_COUNT] = { nullptr };
-    ID3D11ComputeShader* m_PrevComputeShader[COMMANDLIST_COUNT] = { nullptr };
-    ID3D11BlendState* m_PrevBlendState[COMMANDLIST_COUNT] = { nullptr };
-    ID3D11RasterizerState* m_PrevRasterState[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11VertexShader*      m_PrevVertexShader[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11PixelShader*       m_PrevPixelShader[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11HullShader*        m_PrevHullShader[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11DomainShader*      m_PrevDomainShader[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11GeometryShader*    m_PrevGeometryShader[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11ComputeShader*     m_PrevComputeShader[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11BlendState*        m_PrevBlendState[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11RasterizerState*   m_PrevRasterState[COMMANDLIST_COUNT] = { nullptr };
     ID3D11DepthStencilState* m_PrevDepthState[COMMANDLIST_COUNT] = { nullptr };
-    ID3D11InputLayout* m_PrevInputLayout[COMMANDLIST_COUNT] = { nullptr };
+    ID3D11InputLayout*       m_PrevInputLayout[COMMANDLIST_COUNT] = { nullptr };
     D3D11_PRIMITIVE_TOPOLOGY m_PrevTopology[COMMANDLIST_COUNT] = { D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED };
     // Can have (16 samplers dx11) so we need Command list * Slot count amount
-    ID3D11SamplerState* m_PrevSamplerState[COMMANDLIST_COUNT * 16] = { nullptr };
+    ID3D11SamplerState*      m_PrevSamplerState[COMMANDLIST_COUNT * 16] = { nullptr };
 
     //--Fixed Cached States--
     Internal::FixedCache<RasterizerState>	m_RasterMap;
@@ -399,6 +399,8 @@ private:
     FreeList<PipelineState>     m_Pipelines;
     FreeList<GraphicsShader>    m_Shaders;
 
+    //--Blit Stuff--
+    PipelineHandle m_BlitPipeline;
 
 public:
     bool Initialize(const GraphicsParameters& info, const GPUMemory& memoryLimits = GPUMemory(), const GraphicsAdapter* adapter = nullptr);
@@ -479,6 +481,12 @@ public:
     const PipelineState* GetPiplineObject(PipelineHandle handle);
     const GraphicsShader* GetShader(ShaderHandle handle);
 
+    //--Blit functions--;
+    // blit source to target, source is always bound to slot 0
+    void BlitToBuffer(TextureHandle source, RenderHandle target, PipelineHandle pipelineHandle = PipelineHandle());
+    // blit the source into what ever target is currently bound
+    void BlitToBound(TextureHandle source, PipelineHandle pipelineHandle = PipelineHandle());
+
 private:
     void					    CreateDefaultDetphTarget();
     ID3D11ShaderResourceView*   CreateShaderResourceView(const TextureDesc* pDesc, ID3D11Resource* resource);
@@ -490,4 +498,5 @@ private:
     ID3D11RasterizerState*      GetRasterState(const RasterDesc& pDesc);
     ID3D11DepthStencilState*    GetDepthState(const DepthDesc& pDesc);
     ID3D11InputLayout*          GetInputLayout(const InputLayoutDesc& pDesc, const ShaderHandle shader);
+    bool                        InitializeBlitter();
 };

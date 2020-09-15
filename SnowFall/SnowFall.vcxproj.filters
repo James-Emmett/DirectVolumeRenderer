@@ -255,6 +255,15 @@
     <ClInclude Include="Include\VR\D3D\FoveatedRenderHelper_D3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\World\Renderer\PostProcess\PostProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\World\Renderer\PostProcess\ToneMapping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Graphics\RenderTargetPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\System\Assert.cpp">
@@ -420,6 +429,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\VR\FoveatedRenderHelper_D3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\World\Renderer\PostProcess\PostProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\World\Renderer\PostProcess\ToneMapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\RenderTargetPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

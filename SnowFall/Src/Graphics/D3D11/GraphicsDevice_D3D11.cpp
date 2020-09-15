@@ -1,4 +1,6 @@
 #include "Graphics/D3D11/GraphicsDevice_D3D11.h"
+#include "Graphics/CommonStates.h"
+#include "Graphics/VertexTypes.h"
 #include "System/StringUtil.h"
 #include "System/Logger.h"
 #include "System/Window.h"
@@ -356,7 +358,7 @@ bool GraphicsDevice::Initialize(const GraphicsParameters& info, const GPUMemory&
     assert(SUCCEEDED(hr));
 
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-    rtvDesc.Format = (DXGI_FORMAT)FormatToDXGIFormat(LinearToSRGBFormat((SurfaceFormat)m_Parameters.BackBufferFormat));
+    rtvDesc.Format = (DXGI_FORMAT)FormatToDXGIFormat((SurfaceFormat)m_Parameters.BackBufferFormat);
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
     if (FAILED(m_Device->CreateRenderTargetView(m_BackBuffer, &rtvDesc, &m_RenderTarget)))
@@ -388,7 +390,7 @@ bool GraphicsDevice::Initialize(const GraphicsParameters& info, const GPUMemory&
     m_DepthMap.Initialize(64);
     m_RasterMap.Initialize(64);
 
-    return true;
+    return InitializeBlitter();
 }
 
 void GraphicsDevice::Reset(GraphicsParameters info)
@@ -405,7 +407,7 @@ void GraphicsDevice::Reset(GraphicsParameters info)
 
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
     // This should always be non SRGB? We tone map manually?
-    rtvDesc.Format = (DXGI_FORMAT)FormatToDXGIFormat(LinearToSRGBFormat((SurfaceFormat)m_Parameters.BackBufferFormat));
+    rtvDesc.Format = (DXGI_FORMAT)FormatToDXGIFormat((SurfaceFormat)m_Parameters.BackBufferFormat);
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
     assert(SUCCEEDED(m_Device->CreateRenderTargetView(m_BackBuffer, &rtvDesc, &m_RenderTarget)));
@@ -438,6 +440,9 @@ void GraphicsDevice::FlushGPU()
 
 void GraphicsDevice::ShutDown()
 {
+    //--Release Blit--
+    DestroyPipeline(m_BlitPipeline);
+
     //--Release Graphcis Objects--
     m_Buffers.Clear();
     m_Textures.Clear();
@@ -1742,6 +1747,27 @@ const GraphicsShader* GraphicsDevice::GetShader(ShaderHandle handle)
     return m_Shaders[handle];
 }
 
+void GraphicsDevice::BlitToBuffer(TextureHandle source, RenderHandle target, PipelineHandle pipelineHandle)
+{
+    PipelineHandle handle = pipelineHandle.IsValid() ? pipelineHandle : m_BlitPipeline;
+
+    BindPipelineState(handle);
+    UnbindResource(0, 1);
+    ClearRenderTarget(target, Color::Black);
+    BindRenderTarget(target);
+    BindTexture(source, 0);
+    Draw(3, 0, 0);
+}
+
+void GraphicsDevice::BlitToBound(TextureHandle source, PipelineHandle pipelineHandle)
+{
+    PipelineHandle handle = pipelineHandle.IsValid() ? pipelineHandle : m_BlitPipeline;
+    UnbindResource(0, 1);
+    BindPipelineState(handle);
+    BindTexture(source, 0);
+    Draw(3, 0, 0);
+}
+
 
 void GraphicsDevice::CreateDefaultDetphTarget()
 {
@@ -2253,4 +2279,27 @@ ID3D11InputLayout* GraphicsDevice::GetInputLayout(const InputLayoutDesc& pDesc, 
     }
 
     return layout;
+}
+
+bool GraphicsDevice::InitializeBlitter()
+{
+    PipelineDesc desc;
+    desc.BlendState  = CommonStates::Opaque;
+    desc.DepthState  = CommonStates::DepthNone;
+    desc.RasterState = CommonStates::CullNone;
+    desc.Topology    = PrimitiveTopology::TriangleList;
+    desc.InputLayout = InputLayoutDesc(VertexTexture::InputLayout, 2);
+
+    Byte* bytecode; Uint32 length;
+    CompileShader("Assets/Shaders/blit.hlsl", "vert", "vs_5_0", &bytecode, length);
+    desc.VertexShader = CreateShader(ShaderType::VS, bytecode, length);
+    delete[] bytecode;
+
+    CompileShader("Assets/Shaders/blit.hlsl", "frag", "ps_5_0", &bytecode, length);
+    desc.PixelShader = CreateShader(ShaderType::PS, bytecode, length);
+    delete[] bytecode;
+
+    m_BlitPipeline = CreatePipeline(&desc);
+
+    return m_BlitPipeline.IsValid();
 }

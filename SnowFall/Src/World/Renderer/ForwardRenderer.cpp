@@ -6,6 +6,8 @@
 #include "Application/Game.h"
 #include "World/Scene.h"
 
+#include "UI/ImGui_Interface.h"
+
 void ForwardRenderer::Initialize(GraphicsDevice* device)
 {
 	m_GraphicsDevice = device;
@@ -27,9 +29,11 @@ void ForwardRenderer::Initialize(GraphicsDevice* device)
 	}
 	else
 	{
-		m_RenderTargets[0] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R8G8B8A8_Unorm);
+		m_RenderTargets[0] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R16G16B16A16_Float);
 		m_DepthTargets[0]  = m_GraphicsDevice->CreateDepthTarget((Uint32)resolution.x, (Uint32)resolution.y, DepthFormat::Depth32);
 	}
+
+	m_ToneMapper.Initialize(m_GraphicsDevice);
 }
 
 void ForwardRenderer::Render(Scene* scene)
@@ -75,10 +79,10 @@ void ForwardRenderer::Render(Scene* scene)
 		}
 
 		m_VRManager->BindTarget(Eye::Left);
-		m_Blitter.BlitToBound(m_RenderTargets[0]);
+		m_ToneMapper.Apply(m_RenderTargets[0]);
 
 		m_VRManager->BindTarget(Eye::Right);
-		m_Blitter.BlitToBound(m_RenderTargets[1]);
+		m_ToneMapper.Apply(m_RenderTargets[1]);
 
 		m_VRManager->EndFrame();
 	}
@@ -93,7 +97,7 @@ void ForwardRenderer::Render(Scene* scene)
 
 		m_GraphicsDevice->BindDefaultViewPortAndScissor();
 		// just render first camera for testing!
-		RenderCamera(scene, scene->m_CameraList[0], m_RenderTargets[0], m_DepthTargets[0]);//m_RenderTargets[0], m_DepthTargets[0]);
+		RenderCamera(scene, scene->m_CameraList[0], m_RenderTargets[0], m_DepthTargets[0]);
 	
 		if (settings->IsVRS())
 		{
@@ -101,8 +105,13 @@ void ForwardRenderer::Render(Scene* scene)
 		}
 	}
 
-	// Blits Left eye too the output window
-	m_Blitter.BlitToBuffer(m_RenderTargets[0], RenderHandle());
+	ImGui::Begin("debug");
+	m_ToneMapper.OnGui();
+	ImGui::End();
+
+	//--ToneMap Too BackBuffer LDR--
+	m_GraphicsDevice->BindRenderTarget();
+	m_ToneMapper.Apply(m_RenderTargets[0]);
 }
 
 void ForwardRenderer::RenderShadows(Scene* scene)
@@ -153,7 +162,7 @@ void ForwardRenderer::RenderCamera(Scene* scene, std::shared_ptr<Camera> camera,
 	DrawRenderQueue(transQueue);
 
 	//Post Process here, need to fix
-	//RenderPostProcess(target);
+	RenderPostProcess(scene, renderTarget);
 }
 
 void ForwardRenderer::DrawRenderQueue(const RenderQueue& renderQueue)
@@ -210,4 +219,6 @@ void ForwardRenderer::ShutDown()
 
 	if (m_DepthTargets[0].IsValid()) { m_GraphicsDevice->DestroyTexture(m_DepthTargets[0]); }
 	if (m_DepthTargets[1].IsValid()) { m_GraphicsDevice->DestroyTexture(m_DepthTargets[1]); }
+
+	m_ToneMapper.Release();
 }

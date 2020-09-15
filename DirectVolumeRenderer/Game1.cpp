@@ -31,6 +31,7 @@ void Game1::Initialize()
 	
 	m_Camera->m_Transform->SetPosition(Vector3(0, 0, -3));
 	m_Camera->m_Background = Color(0.3f, 0.3f, 0.3f, 1.0f);
+	m_Camera->m_ClearFlags = ClearFlag::SkyBox;
 	
 	//Entity* cabinet = m_Scene.CreateEntity(Application::NextEntityID());
 	//cabinet->m_Transform->SetPosition(Vector3(2, 0, 0));

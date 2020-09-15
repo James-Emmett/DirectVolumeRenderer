@@ -2,6 +2,7 @@
 #include "World/Entity.h"
 #include "Application/Application.h"
 #include "Content/ContentManager.h"
+#include <World\Renderer\PostProcess\PostProcessor.h>
 
 void Scene::Initialize(GraphicsDevice* device)
 {
@@ -81,6 +82,23 @@ void Scene::RemoveCameraComponent(std::shared_ptr<Camera> component)
 	if (itr != m_CameraList.end())
 	{
 		m_CameraList.erase(itr);
+	}
+}
+
+void Scene::AddPostProcessor(std::shared_ptr<PostProcessor> postprocess)
+{
+	m_PostProcessors.push_back(postprocess);
+	std::sort(m_PostProcessors.begin(), m_PostProcessors.end(), std::less<std::shared_ptr<PostProcessor>>());
+}
+
+void Scene::RemovePostProcessor(std::shared_ptr<PostProcessor> postProcess)
+{
+	for (size_t i = 0; i < m_PostProcessors.size(); i++)
+	{
+		if (m_PostProcessors[i] == postProcess)
+		{
+			m_PostProcessors.erase(m_PostProcessors.begin() + i);
+		}
 	}
 }
 

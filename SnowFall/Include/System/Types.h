@@ -35,6 +35,11 @@ struct Handle
 	{
 		return Generation != UINT16_MAX;
 	}
+
+	bool operator==(const Handle& handle)const
+	{
+		return (Index == handle.Index) && (Generation == handle.Generation);
+	}
 };
 
 // Jsut a single ID without GENERATION!!!

@@ -16,7 +16,6 @@ struct v2f
 	float2 uv  : TEXCOORD0;
 };
 
-// Create fullscreen quad
 v2f vert(uint id : SV_VERTEXID)
 {
 	v2f o;

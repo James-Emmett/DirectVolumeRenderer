@@ -7,6 +7,13 @@ const InputElement Vertex::InputLayout[1] =
 };
 
 //-----------------------------------------------------------------------------
+const InputElement VertexTexture::InputLayout[2] =
+{
+	{ "POSITION"   , 0, 0, SurfaceFormat::R32G32B32_Float   , InputElement::ALIGNED_ELEMENT, InputType::VertexData, 0 },
+	{ "TEXCOORD"   , 0, 0, SurfaceFormat::R32G32_Float      , InputElement::ALIGNED_ELEMENT, InputType::VertexData, 0 }
+};
+
+//-----------------------------------------------------------------------------
 const InputElement VertexColorTexture::InputLayout[3] =
 {
 	{ "POSITION"   , 0, 0, SurfaceFormat::R32G32B32_Float   , InputElement::ALIGNED_ELEMENT, InputType::VertexData, 0 },

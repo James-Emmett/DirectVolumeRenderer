@@ -23,6 +23,7 @@ enum class ComponentChange { Add, Remove };
 
 class RenderComponent;
 class BaseComponent;
+class PostProcessor;
 class Entity;
 class Scene
 {
@@ -33,13 +34,14 @@ private:
 
 	EntityMap m_EntityMap;
 	GraphicsDevice* m_GraphicsDevice;
+
 public:
 	RenderSettings m_RenderSettings;
-
 	//--List of Core Components--
 	std::vector<std::shared_ptr<Camera>>			m_CameraList;
 	//std::vector<std::shared_ptr<Light>>			m_LightList;
 	std::vector<std::shared_ptr<RenderComponent>>	m_RenderList;
+	std::vector<std::shared_ptr<PostProcessor>>     m_PostProcessors;
 
 public:
 	void Initialize(GraphicsDevice* device);
@@ -52,6 +54,8 @@ public:
 	void AddCameraComponent(std::shared_ptr<Camera> component);
 	void RemoveRenderComponent(std::shared_ptr<RenderComponent> component);
 	void RemoveCameraComponent(std::shared_ptr<Camera> component);
+	void AddPostProcessor(std::shared_ptr<PostProcessor> postprocess);
+	void RemovePostProcessor(std::shared_ptr<PostProcessor> postProcess);
 
 	void OnEntityComponentChanged(std::shared_ptr<BaseComponent> component, ComponentChange changeType);
 };

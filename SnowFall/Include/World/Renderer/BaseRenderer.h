@@ -15,7 +15,6 @@ protected:
 	GraphicsDevice* m_GraphicsDevice = nullptr;
 	VR_Manager*		m_VRManager = nullptr;
 	BufferHandle	m_ConstantBuffers[(Uint32)UniformTypes::Count];
-	Blitter			m_Blitter;
 
 public:
 	virtual void Initialize(GraphicsDevice* device);
@@ -30,4 +29,5 @@ protected:
 	void SetEnviromentTextures(Scene* scene);
 	void DrawSkybox(Scene* scene, std::shared_ptr<Camera> camera);
 	virtual void RenderCamera(Scene* scene, std::shared_ptr<Camera> camera, RenderHandle renderTarget, DepthHandle depthTarget) = 0;
+	void RenderPostProcess(Scene* scene, RenderHandle target);
 };

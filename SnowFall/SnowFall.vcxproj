@@ -185,6 +185,7 @@
     <ClInclude Include="Include\Graphics\Graphics.h" />
     <ClInclude Include="Include\Graphics\GraphicsAdapter.h" />
     <ClInclude Include="Include\Graphics\GraphicsDevice.h" />
+    <ClInclude Include="Include\Graphics\RenderTargetPool.h" />
     <ClInclude Include="Include\Graphics\VertexTypes.h" />
     <ClInclude Include="Include\Input\GamePad.h" />
     <ClInclude Include="Include\Input\Input.h" />
@@ -227,6 +228,8 @@
     <ClInclude Include="Include\World\Entity.h" />
     <ClInclude Include="Include\World\Renderer\BaseRenderer.h" />
     <ClInclude Include="Include\World\Renderer\ForwardRenderer.h" />
+    <ClInclude Include="Include\World\Renderer\PostProcess\PostProcessor.h" />
+    <ClInclude Include="Include\World\Renderer\PostProcess\ToneMapping.h" />
     <ClInclude Include="Include\World\Renderer\RenderCommon.h" />
     <ClInclude Include="Include\World\Renderer\RenderSettings.h" />
     <ClInclude Include="Include\World\Renderer\SkyBox.h" />
@@ -245,6 +248,7 @@
     <ClCompile Include="Src\Content\Resource.cpp" />
     <ClCompile Include="Src\Content\Shader.cpp" />
     <ClCompile Include="Src\Content\Texture.cpp" />
+    <ClCompile Include="Src\Graphics\RenderTargetPool.cpp" />
     <ClCompile Include="Src\Graphics\VertexTypes.cpp" />
     <ClCompile Include="Src\System\Win32\FileDialog.cpp" />
     <ClCompile Include="Src\VR\FoveatedRenderHelper_D3D.cpp" />
@@ -286,6 +290,8 @@
     <ClCompile Include="Src\World\Component\Transform.cpp" />
     <ClCompile Include="Src\World\Entity.cpp" />
     <ClCompile Include="Src\World\Renderer\ForwardRenderer.cpp" />
+    <ClCompile Include="Src\World\Renderer\PostProcess\PostProcessor.cpp" />
+    <ClCompile Include="Src\World\Renderer\PostProcess\ToneMapping.cpp" />
     <ClCompile Include="Src\World\Renderer\Skybox.cpp" />
     <ClCompile Include="Src\World\Scene.cpp" />
   </ItemGroup>
