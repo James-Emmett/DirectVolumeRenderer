@@ -244,10 +244,10 @@ struct PipelineState
     ShaderHandle				m_DomainShader = ShaderHandle();
     ShaderHandle				m_HullShader = ShaderHandle();
     ShaderHandle				m_GeometaryShader = ShaderHandle();
-    ID3D11BlendState* m_BlendState = nullptr;
-    ID3D11RasterizerState* m_RasterState = nullptr;
-    ID3D11DepthStencilState* m_DepthStencilState = nullptr;
-    ID3D11InputLayout* m_InputLayout = nullptr;
+    ID3D11BlendState*           m_BlendState = nullptr;
+    ID3D11RasterizerState*      m_RasterState = nullptr;
+    ID3D11DepthStencilState*    m_DepthStencilState = nullptr;
+    ID3D11InputLayout*          m_InputLayout = nullptr;
     PrimitiveTopology			m_TopologyType = PrimitiveTopology::TriangleList;
     Uint32						m_NumRenderTargets = 1;
     DXGI_FORMAT					m_RTVFormats[8] = { DXGI_FORMAT_UNKNOWN };

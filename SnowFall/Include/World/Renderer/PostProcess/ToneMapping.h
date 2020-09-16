@@ -10,8 +10,8 @@
 struct ToneMappingSettings
 {
 	float _Gamma = 2.2f;
-	float _Exposure = 1.9f;
-	int	  _Tonetype = 0;
+	float _Exposure = 1.8f;
+	int	  _Tonetype = 1;
 	float _Pad_01 = 0.0f;
 };
 

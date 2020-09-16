@@ -4,7 +4,7 @@
 void Game1::Initialize()
 {
 	// Set clear color
-	m_GraphicsDevice->SetDefaultClearColor(Color(0.01f, 0.01f, 0.01f, 1.0f));
+	m_GraphicsDevice->SetDefaultClearColor(Color(0.01f, 0.01f, 0.01f, 1.0f).Linear());
 
 	// Init scene and set skybox
 	m_Scene.Initialize(m_GraphicsDevice);
@@ -19,6 +19,7 @@ void Game1::Initialize()
 	// Create Camera
 	Entity* camera = m_Scene.CreateEntity(Application::NextEntityID());
 	m_Camera = camera->AddComponent<FlyCamera>();
+	m_Camera->m_ClearFlags = ClearFlag::SolidColor;
 	
 	if (m_GameSettings.GetIsStero() == false)
 	{
@@ -30,8 +31,7 @@ void Game1::Initialize()
 	}
 	
 	m_Camera->m_Transform->SetPosition(Vector3(0, 0, -3));
-	m_Camera->m_Background = Color(0.3f, 0.3f, 0.3f, 1.0f);
-	m_Camera->m_ClearFlags = ClearFlag::SkyBox;
+	m_Camera->m_Background = Color(0.5f, 0.5f, 0.5f, 1.0f).Linear();
 	
 	//Entity* cabinet = m_Scene.CreateEntity(Application::NextEntityID());
 	//cabinet->m_Transform->SetPosition(Vector3(2, 0, 0));

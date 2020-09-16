@@ -201,7 +201,7 @@ void ForwardRenderer::Resize()
 		if (m_RenderTargets[0].IsValid())
 		{
 			m_GraphicsDevice->DestroyTexture(m_RenderTargets[0]);
-			m_RenderTargets[0] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R8G8B8A8_Unorm);
+			m_RenderTargets[0] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R16G16B16A16_Float);
 		}
 
 		if (m_DepthTargets[0].IsValid())

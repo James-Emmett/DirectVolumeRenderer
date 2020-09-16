@@ -174,12 +174,7 @@ float4 frag(v2f i) : SV_TARGET
 	// This seems more reliable than checking if we left the volume for some reason?
 	float iteractions = length((ray.End - ray.Start) * _OccupancySize);
 	for(int j = 0; j <= iteractions; ++j)
-	{
-		if(j >= 32)
-		{
-			//return float4(1,1,0,1);
-		}
-		
+	{	
 		// Finds shortest axis its the next t intersection
 		voxelIncr.x = (t.x <= t.y) && (t.x <= t.z);
 		voxelIncr.y = (t.y <= t.x) && (t.y <= t.z);
