@@ -35,5 +35,6 @@ public:
 	void Initialize(GraphicsDevice* device, ContentManager* contentManager, std::string computePath);
 	void GenerateVolumeGrid(std::shared_ptr<Texture> src, std::shared_ptr<Texture> transfer);
 	std::shared_ptr<Texture> GetOccupancyTexture()const;
+	Vector3 VoxelsPerCell()const;
 	void Release();
 };

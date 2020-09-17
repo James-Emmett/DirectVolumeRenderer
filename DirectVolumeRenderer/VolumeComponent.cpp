@@ -145,7 +145,7 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetTexture(2, m_TransferFunction.GetDiffuseTransfer());
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetTexture(3, m_TransferFunction.GetSurfaceTransfer());
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetVector3("VolumeDims", dims);
-	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetVector3("OccupancyDims", occupancyDims);
+	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetVector3("OccupancyDims", dims / m_OccupancyGenerator.VoxelsPerCell());
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetVector3("StepSize", stepSize);
 	m_VolumeMaterials[(Uint32)VolumeMethod::PBR_ESS]->SetFloat("Iterations", maxSize);
 

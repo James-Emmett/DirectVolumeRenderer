@@ -27,7 +27,7 @@ void VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Texture> source, std::s
 	m_GridData.m_VolumeDims.x = (float)width;
 	m_GridData.m_VolumeDims.y = (float)height;
 	m_GridData.m_VolumeDims.z = (float)depth;
-	m_GridData.m_VoxelsPerCell = Vector3(8, 8, 8);
+	m_GridData.m_VoxelsPerCell = Vector3(4, 4, 4);
 
 	m_GraphicsDevice->UpdateBuffer(m_ConstantBuffer, (Byte*)&m_GridData, sizeof(GridData));
 	m_GraphicsDevice->BindConstantBuffer(m_ConstantBuffer, 0);
@@ -38,11 +38,12 @@ void VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Texture> source, std::s
 
 	// Bind a UAV texture for Compute Result
 	Texture computeResult;
-	computeResult.Create3D(width / 8, height / 8, depth / 8, BufferUsage::Default, SurfaceFormat::R8_Unorm);
+	computeResult.Create3D(width / m_GridData.m_VoxelsPerCell.x, height / m_GridData.m_VoxelsPerCell.y, depth / m_GridData.m_VoxelsPerCell.z, BufferUsage::Default, SurfaceFormat::R8_Unorm);
 	computeResult.SetUnorderedAccess();
 	computeResult.Apply();
 	computeResult.Bind(0, ShaderType::CS);
 
+	// 8,8,8 threads per group so dispatch is  (size / voxels per cell) / 8 that way we know how many dispatchs to groups we need.
 	Vector3 dispatch = Vector3(((width / m_GridData.m_VoxelsPerCell.x) / 8), ((height / m_GridData.m_VoxelsPerCell.y) / 8),
 		((depth / m_GridData.m_VoxelsPerCell.z) / 8));
 
@@ -55,8 +56,8 @@ void VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Texture> source, std::s
 	if (m_OccupancyMap == nullptr)
 	{
 		m_OccupancyMap = std::make_shared<Texture>();
-		m_OccupancyMap->Create3D(width / 8, height / 8, depth / 8, BufferUsage::Dynamic, SurfaceFormat::R8_Unorm);
-		m_OccupancyMap->SetFilter(FilterMode::MinMagMipPoint);
+		m_OccupancyMap->Create3D(width / m_GridData.m_VoxelsPerCell.x, height / m_GridData.m_VoxelsPerCell.y, depth / m_GridData.m_VoxelsPerCell.z, BufferUsage::Dynamic, SurfaceFormat::R8_Unorm);
+		m_OccupancyMap->SetFilter(FilterMode::MaximunMinMagMipLinear);
 		m_OccupancyMap->SetWrapMode(WrapMode::Clamp);
 	}
 
@@ -68,6 +69,11 @@ void VolumeOccupancy::GenerateVolumeGrid(std::shared_ptr<Texture> source, std::s
 std::shared_ptr<Texture> VolumeOccupancy::GetOccupancyTexture() const
 {
 	return m_OccupancyMap;
+}
+
+Vector3 VolumeOccupancy::VoxelsPerCell() const
+{
+	return m_GridData.m_VoxelsPerCell;
 }
 
 void VolumeOccupancy::Release()

@@ -1,8 +1,8 @@
 Texture3D<float4> _InputBuffer : register(t0);
 RWTexture3D<float> _Result : register(u0);
 
-Texture2D _AlbedoTransfer : register(t1);
-SamplerState _AlbedoSampler 	  : register(s1);
+Texture2D _AlbedoTransfer 		: register(t1);
+SamplerState _AlbedoSampler 	: register(s1);
 
 cbuffer VolumeData : register(b0)
 {

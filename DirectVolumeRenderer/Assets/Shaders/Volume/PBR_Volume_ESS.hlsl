@@ -147,34 +147,20 @@ float4 frag(v2f i) : SV_TARGET
 	float3 stepDir = float3(0,0,0);
 	
 	// Current voxel were starting on
-	float3 currentV = float3(rayStart.x, rayStart.y, rayStart.z);
-	float3 lastVoxel = float3(rayEnd.x, rayEnd.y, rayEnd.z);
+	int3 currentV = int3(rayStart.x, rayStart.y, rayStart.z);
+	int3 lastVoxel = int3(rayEnd.x, rayEnd.y, rayEnd.z);
 	
-	if(rayDir.x != 0)
+	if(all(rayDir) != 0)
 	{
-		stepDir.x = (rayDir.x < 0)? -1 : 1;
-		deltaT.x = 1.0f /rayDir.x * stepDir.x;
-		t.x = ((currentV.x + stepDir.x) - rayStart.x) / rayDir.x;
-	}
-
-	if(rayDir.y != 0)
-	{
-		stepDir.y = (rayDir.y < 0)? -1 : 1;
-		deltaT.y = 1.0f /rayDir.y * stepDir.y;
-		t.y = ((currentV.y + stepDir.y) - rayStart.y) / rayDir.y;
-	}
-
-	if(rayDir.z != 0)
-	{
-		stepDir.z = (rayDir.z < 0)? -1 : 1;
-		deltaT.z = 1.0f /rayDir.z * stepDir.z;
-		t.z = ((currentV.z + stepDir.z) - rayStart.z) / rayDir.z;
+		stepDir = (rayDir < 0)? -1 : 1;
+		deltaT = (1.0f /rayDir) * stepDir;
+		t = ((currentV + stepDir) - rayStart) / rayDir;
 	}
 	
 	// This seems more reliable than checking if we left the volume for some reason?
-	float iteractions = length((ray.End - ray.Start) * _OccupancySize);
+	int iteractions = length((ray.End - ray.Start) * _OccupancySize);
 	for(int j = 0; j <= iteractions; ++j)
-	{	
+	{
 		// Finds shortest axis its the next t intersection
 		voxelIncr.x = (t.x <= t.y) && (t.x <= t.z);
 		voxelIncr.y = (t.y <= t.x) && (t.y <= t.z);
@@ -188,17 +174,17 @@ float4 frag(v2f i) : SV_TARGET
 		currentV += voxelIncr * stepDir;
 
 		// Get intensity of voxel at the current voxel, normalize currentV to do so!
-		float intensity = _OccupancyMap.SampleLevel(_OccupancyMapSampler, currentV/_OccupancySize, 0).r;
-		
+		float intensity = _OccupancyMap.SampleLevel(_OccupancyMapSampler, abs(currentV/_OccupancySize), 0).r;
+
 		// Run shading if intensity is high enough.
 		if(intensity >= _Hounsfield)
-		{
+		{	
 			float3 start = (ray.Start + (previousT * ray.Dir));
 			float3 end = (ray.Start + (t * ray.Dir));
 			
 			// This mathmatically should be the ideal steps for the inner voxel reigon!
 			int innerVoxelSteps = length((end - start))/ _StepSize;
-			for(int j = 0; j < innerVoxelSteps; ++j)
+			for(int j = 0; j <= innerVoxelSteps; ++j)
 			{
 				// Sample origional volume with p
 				float4 voxel = _VolumeMap.SampleLevel(_VolumeSampler, start, 0).rgba;

@@ -22,8 +22,8 @@ void ForwardRenderer::Initialize(GraphicsDevice* device)
 	if (gameSettings->GetIsStero())
 	{
 		resolution = m_VRManager->GetResolution();
-		m_RenderTargets[0] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R8G8B8A8_Unorm);
-		m_RenderTargets[1] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R8G8B8A8_Unorm);
+		m_RenderTargets[0] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R16G16B16A16_Float);
+		m_RenderTargets[1] = m_GraphicsDevice->CreateRenderTarget((Uint32)resolution.x, (Uint32)resolution.y, RenderFormat::R16G16B16A16_Float);
 		m_DepthTargets[0]  = m_GraphicsDevice->CreateDepthTarget((Uint32)resolution.x, (Uint32)resolution.y, DepthFormat::Depth32);
 		m_DepthTargets[1]  = m_GraphicsDevice->CreateDepthTarget((Uint32)resolution.x, (Uint32)resolution.y, DepthFormat::Depth32);
 	}
@@ -104,10 +104,6 @@ void ForwardRenderer::Render(Scene* scene)
 			m_FoveatedRendering->DisableFoveatedRendering();
 		}
 	}
-
-	ImGui::Begin("debug");
-	m_ToneMapper.OnGui();
-	ImGui::End();
 
 	//--ToneMap Too BackBuffer LDR--
 	m_GraphicsDevice->BindRenderTarget();
