@@ -27,20 +27,20 @@ void CSMain(uint3 id : SV_DispatchThreadID )
 	uint3 volumePos = _VoxelsPerCell * id;
 	
 	// Get min and max bounding points
-	float3 minVolumePos = max(volumePos - 1, float3(0,0,0));
-	float3 maxVolumePos = min(volumePos + _VoxelsPerCell + 1, _VolumeDimensions);
+	float3 minVolumePos = max(volumePos, float3(0,0,0));
+	float3 maxVolumePos = min(volumePos + _VoxelsPerCell, _VolumeDimensions);
 	
 	// Find the maz iso value for this chunk of the volume!
 	int Width = maxVolumePos.x, Height = maxVolumePos.y, Depth = maxVolumePos.z;
-	float fmax = 0;
-	for (int z = minVolumePos.z; z < Depth; z++)
+	float fmax = -1000;
+	for (int z = minVolumePos.z; z <= Depth; z++)
 	{
-		for (int y = minVolumePos.y; y < Height; y++)
+		for (int y = minVolumePos.y; y <= Height; y++)
 		{
-			for (int x = minVolumePos.x; x < Width; x++)
+			for (int x = minVolumePos.x; x <= Width; x++)
 			{	
 				// Find max alpha of the chunk
-				float4 microfacet = _AlbedoTransfer.SampleLevel(_AlbedoSampler, float2(ReadPixel(x, y, z), 0.25), 0);
+				float4 microfacet = _AlbedoTransfer.SampleLevel(_AlbedoSampler, float2(ReadPixel(x, y, z), 0), 0);
 				fmax = max(fmax, microfacet.w);
 			}
 		}

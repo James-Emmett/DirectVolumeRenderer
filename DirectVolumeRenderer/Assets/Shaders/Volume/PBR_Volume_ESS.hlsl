@@ -147,24 +147,24 @@ float4 frag(v2f i) : SV_TARGET
 	float3 stepDir = float3(0,0,0);
 	
 	// Current voxel were starting on
-	int3 currentV = int3(rayStart.x, rayStart.y, rayStart.z);
-	int3 lastVoxel = int3(rayEnd.x, rayEnd.y, rayEnd.z);
+	float3 currentV = float3(rayStart.x, rayStart.y, rayStart.z);
+	float3 lastVoxel = float3(rayEnd.x, rayEnd.y, rayEnd.z);
 	
-	if(ray.Dir.x != 0)
+	if(rayDir.x != 0)
 	{
 		stepDir.x = (rayDir.x < 0)? -1 : 1;
 		deltaT.x = 1.0f /rayDir.x * stepDir.x;
 		t.x = ((currentV.x + stepDir.x) - rayStart.x) / rayDir.x;
 	}
 
-	if(ray.Dir.y != 0)
+	if(rayDir.y != 0)
 	{
 		stepDir.y = (rayDir.y < 0)? -1 : 1;
 		deltaT.y = 1.0f /rayDir.y * stepDir.y;
 		t.y = ((currentV.y + stepDir.y) - rayStart.y) / rayDir.y;
 	}
 
-	if(ray.Dir.z != 0)
+	if(rayDir.z != 0)
 	{
 		stepDir.z = (rayDir.z < 0)? -1 : 1;
 		deltaT.z = 1.0f /rayDir.z * stepDir.z;
