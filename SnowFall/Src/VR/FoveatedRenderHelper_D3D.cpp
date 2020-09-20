@@ -332,6 +332,12 @@ void FoveatedRenderHelper::GetShadingRateResource()
 
         if (NvStatus == NVAPI_OK)
         {
+            if (m_pSRRShaderResourceView)
+            {
+                m_pSRRShaderResourceView->Release();
+                m_pSRRShaderResourceView = NULL;
+            }
+
             m_pShadingRateResource->GetDesc(&m_srrTexDesc);
             hr = m_GraphicsDevice->GetDevice()->CreateShaderResourceView(m_pShadingRateResource, NULL, &m_pSRRShaderResourceView);
             if (hr == S_OK)
@@ -402,9 +408,11 @@ void FoveatedRenderHelper::ShutDown()
         }
 
         PurgeInternalVRSResources();
-
         m_pGazeHandler->Release();
         m_pVRSHelper->Release();
+        m_GraphicsDevice->GetDevice()->Release();
+        m_GraphicsDevice->GetDevice()->Release();
+        m_GraphicsDevice->GetDevice()->Release();
     }
 }
 
