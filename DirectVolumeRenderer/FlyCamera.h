@@ -30,11 +30,21 @@ public:
 		if (Input::GetButton(Button::Mouse_Right))
 		{
 			//--Update camera--
-			// Rotation is  hack to fix the roll drift :/
+			// Rotation is hack to fix the roll drift :/
 			Rotate(mouseLook.x, mouseLook.y);
 		}
 
 		Move(delta * moveSpeed * deltaTime);
+
+		if (Input::GetKeyDown(Keys::Q))
+		{
+			Rotate(45, 0);
+		}
+		else if (Input::GetKeyDown(Keys::E))
+		{
+			Rotate(-45, 0);
+		}
+
 		Camera::Update(deltaTime);
 	}
 };

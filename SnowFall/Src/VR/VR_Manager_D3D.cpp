@@ -173,7 +173,7 @@ bool VR_Manager::CreateSession(GraphicsDevice* device)
 		swapInfo.arraySize		= 1;
 		swapInfo.mipCount		= 1;
 		swapInfo.faceCount		= 1;
-		swapInfo.format			= DXGI_FORMAT_R8G8B8A8_UNORM; // Make this dynamic in the future.
+		swapInfo.format			= DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // Make this dynamic in the future.
 		swapInfo.width			= view.recommendedImageRectWidth;
 		swapInfo.height			= view.recommendedImageRectHeight;
 		swapInfo.sampleCount	= view.recommendedSwapchainSampleCount;

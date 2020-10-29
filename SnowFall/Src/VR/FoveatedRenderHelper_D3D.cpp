@@ -196,6 +196,11 @@ void FoveatedRenderHelper::LatchGazeData()
 
 void FoveatedRenderHelper::EnableFoveatedRendering(NV_VRS_RENDER_MODE renderMode)
 {
+    if (m_initialized == false)
+    {
+        // Just use defualt for now.
+        Initialize(Application::graphicsDevice);
+    }
 
     NvAPI_Status NvStatus = NVAPI_OK;
 

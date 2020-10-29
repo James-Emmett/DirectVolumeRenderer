@@ -52,6 +52,9 @@ public:
 	Vector3 Right()const;
 	Vector3 Up()const;
 	Vector3 Forward()const;
+	Vector3 LocalRight()const;
+	Vector3 LocalUp()const;
+	Vector3 LocalForward()const;
 	Matrix4 World()const;
 	Matrix4 WorldToLocalMatrix()const; // Its just the inverse
 

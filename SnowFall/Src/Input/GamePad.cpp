@@ -15,7 +15,14 @@ float ApplyLinearDeadZone(float value, float deadZone)
 
 Vector2 ApplyRadialDeadZone(Vector2 value, float deadZone)
 {
-	return (value.LengthSquared() < (deadZone * deadZone)) ? Vector2::Zero : Vector2::ClampMagnitude(Vector2::Normalize(value) * ((value.LengthSquared() - deadZone) / (1.0f - deadZone)), 1);
+	if (value.LengthSquared() < (deadZone * deadZone))
+	{
+		return Vector2::Zero;
+	}
+	else
+	{
+		return Vector2::Normalize(value) * ((value.Length() - deadZone) / (1.0f - deadZone));
+	}
 }
 
 const GamePadState GamePad::GetState(PlayerIndex index, GamePadDeadZone deadZone, Vector2 deadZoneAmount)
@@ -83,8 +90,8 @@ const GamePadState GamePad::GetState(PlayerIndex index, GamePadDeadZone deadZone
 	}
 	else if (deadZone == GamePadDeadZone::Radial)
 	{
-		gamePadState.ThumbSticks.Left = ApplyRadialDeadZone(gamePadState.ThumbSticks.Left, deadZoneAmount.Length());
-		gamePadState.ThumbSticks.Right = ApplyRadialDeadZone(gamePadState.ThumbSticks.Right, deadZoneAmount.Length());
+		gamePadState.ThumbSticks.Left = ApplyRadialDeadZone(gamePadState.ThumbSticks.Left, deadZoneAmount.x);
+		gamePadState.ThumbSticks.Right = ApplyRadialDeadZone(gamePadState.ThumbSticks.Right, deadZoneAmount.y);
 	}
 
 	return gamePadState;

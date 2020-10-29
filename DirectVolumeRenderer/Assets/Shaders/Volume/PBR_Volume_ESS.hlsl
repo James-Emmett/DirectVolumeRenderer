@@ -16,10 +16,10 @@ static const int MAX_SAMPLES = 800;
 
 cbuffer PerMaterial : register(b3)
 {
-	float  _Hounsfield;
 	float3 _StepSize;
-	float  _Iterations;
+	float  _Hounsfield;
 	float3 _VolumeSize;
+	float  _Iterations;
 	float3 _OccupancySize;
 };
 
@@ -158,7 +158,7 @@ float4 frag(v2f i) : SV_TARGET
 	}
 	
 	// This seems more reliable than checking if we left the volume for some reason?
-	int iteractions = length((ray.End - ray.Start) * _OccupancySize);
+	int iteractions = abs(length(rayEnd - rayStart) * 1.25f);
 	for(int j = 0; j <= iteractions; ++j)
 	{
 		// Finds shortest axis its the next t intersection
@@ -179,11 +179,14 @@ float4 frag(v2f i) : SV_TARGET
 		// Run shading if intensity is high enough.
 		if(intensity >= _Hounsfield)
 		{	
+			// Try find start and end + a step amount?
 			float3 start = (ray.Start + (previousT * ray.Dir));
 			float3 end = (ray.Start + (t * ray.Dir));
 			
-			// This mathmatically should be the ideal steps for the inner voxel reigon!
-			int innerVoxelSteps = length((end - start))/ _StepSize;
+			// Doesnt quite work yet, works using magic number repalce with statistical
+			// method!
+			int innerVoxelSteps = abs(ceil(length(end - start)/_StepSize));
+			
 			for(int j = 0; j <= innerVoxelSteps; ++j)
 			{
 				// Sample origional volume with p

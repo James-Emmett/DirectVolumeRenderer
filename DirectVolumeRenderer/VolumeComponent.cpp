@@ -105,7 +105,9 @@ void VolumeComponent::LoadVolume(std::string volumePath)
 	m_VolumeData.Depth = (float)m_VolumeMap->GetDepth();
 
 	Vector3 dims = Vector3(m_VolumeData.Width, m_VolumeData.Height, m_VolumeData.Depth);
-	Vector3 occupancyDims = dims / 8;
+	Vector3 occupancyDims = Vector3(ceil(dims.x / m_OccupancyGenerator.VoxelsPerCell().x), 
+									ceil(dims.y / m_OccupancyGenerator.VoxelsPerCell().y), 
+									ceil(dims.z / m_OccupancyGenerator.VoxelsPerCell().z));
 
 	// Calculate the max size and step size to take, its always 1/maxsize
 	float maxSize = (float)Mathf::Max(m_VolumeData.Width, Mathf::Max(m_VolumeData.Height, m_VolumeData.Depth));

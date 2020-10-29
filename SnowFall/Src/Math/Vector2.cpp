@@ -236,7 +236,7 @@ Vector2 Vector2::Normalize(const Vector2& vector)
 	}
 
 	float recip = Mathf::RecipSqrt(magSqr);
-	product.x = vector.y * recip;
+	product.x = vector.x * recip;
 	product.y = vector.y * recip;
 
 	return product;

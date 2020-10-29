@@ -84,15 +84,45 @@ void Transform::SetScale(const Vector3& scale)
 
 Vector3 Transform::Right() const
 {
-    return m_LocalRotation * Vector3::Right;
+    if (m_HashChanged)
+    {
+        UpdateTransform();
+    }
+
+    return m_WorldRotation * Vector3::Right;
 }
 
 Vector3 Transform::Up() const
 {
-    return m_LocalRotation * Vector3::Up;
+    if (m_HashChanged)
+    {
+        UpdateTransform();
+    }
+
+    return m_WorldRotation * Vector3::Up;
 }
 
 Vector3 Transform::Forward() const
+{
+    if (m_HashChanged)
+    {
+        UpdateTransform();
+    }
+
+    return m_WorldRotation * Vector3::Forward;
+}
+
+Vector3 Transform::LocalRight() const
+{
+    return m_LocalRotation * Vector3::Right;
+}
+
+Vector3 Transform::LocalUp() const
+{
+    return m_LocalRotation * Vector3::Up;
+}
+
+Vector3 Transform::LocalForward() const
 {
     return m_LocalRotation * Vector3::Forward;
 }

@@ -6,10 +6,10 @@
 		<Property name="AlbedoTransfer" type="Texture"/>
 		<Property name="SurfaceTransfer" type="Texture"/>
 		<Property name="Noise" type="Texture"/>
-		<Property name="Hounsfield" type="Float" min="0" max="1.0"/>
 		<Property name="StepSize" type="Vector3"/>
-		<Property name="Iterations" type="Float" min="0" max="1.0"/>
+		<Property name="Hounsfield" type="Float" min="0" max="1.0"/>
 		<Property name="VolumeDims" type="Vector3"/>
+		<Property name="Iterations" type="Float" min="0" max="1.0"/>
 		<Property name="OccupancyDims" type="Vector3"/>
 	</Properties>
 	
